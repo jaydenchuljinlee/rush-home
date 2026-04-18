@@ -885,11 +885,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3291217024253382315, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
       propertyPath: groundLayer.m_Bits
-      value: 0
+      value: 256
+      objectReference: {fileID: 0}
+    - target: {fileID: 4619497071649464487, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
+      propertyPath: m_Size.x
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4619497071649464487, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
+      propertyPath: m_Size.y
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 8427315609133063541, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 8427315609133063541, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
