@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d45e4af0957447feb721d6ab0e4bc9a, type: 3}
+  m_Name: DifficultyData
+  m_EditorClassIdentifier: HomeRun.Runtime::DifficultyData
+  easySpeed: 6
+  normalSpeed: 8
+  hardSpeed: 11
+  extremeSpeed: 15
+  normalThreshold: 30
+  hardThreshold: 60
+  extremeThreshold: 90

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 플레이어 자동 달리기, 점프, 슬라이딩을 처리하는 컨트롤러.
@@ -67,12 +68,14 @@ public class PlayerController : MonoBehaviour
 
     private void HandleKeyboardInput()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+        if (Keyboard.current == null) return;
+
+        if (Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
         {
             TryJump();
         }
 
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        if (Keyboard.current.downArrowKey.wasPressedThisFrame)
         {
             TrySlide();
         }
@@ -80,34 +83,31 @@ public class PlayerController : MonoBehaviour
 
     private void HandleTouchInput()
     {
-        if (Input.touchCount <= 0) return;
+        if (Touchscreen.current == null) return;
 
-        Touch touch = Input.GetTouch(0);
+        var touch = Touchscreen.current.primaryTouch;
 
-        switch (touch.phase)
+        if (touch.press.wasPressedThisFrame)
         {
-            case TouchPhase.Began:
-                _touchStartPos = touch.position;
-                _isTouching = true;
-                break;
+            _touchStartPos = touch.position.ReadValue();
+            _isTouching = true;
+        }
+        else if (touch.press.wasReleasedThisFrame && _isTouching)
+        {
+            _isTouching = false;
+            Vector2 touchEndPos = touch.position.ReadValue();
+            Vector2 swipeDelta = touchEndPos - _touchStartPos;
 
-            case TouchPhase.Ended:
-                if (!_isTouching) break;
-                _isTouching = false;
-
-                Vector2 swipeDelta = touch.position - _touchStartPos;
-
-                if (swipeDelta.magnitude < SwipeThreshold)
-                {
-                    // 탭 = 점프
-                    TryJump();
-                }
-                else if (swipeDelta.y < -SwipeThreshold && Mathf.Abs(swipeDelta.y) > Mathf.Abs(swipeDelta.x))
-                {
-                    // 아래 스와이프 = 슬라이딩
-                    TrySlide();
-                }
-                break;
+            if (swipeDelta.magnitude < SwipeThreshold)
+            {
+                // 탭 = 점프
+                TryJump();
+            }
+            else if (swipeDelta.y < -SwipeThreshold && Mathf.Abs(swipeDelta.y) > Mathf.Abs(swipeDelta.x))
+            {
+                // 아래 스와이프 = 슬라이딩
+                TrySlide();
+            }
         }
     }
 
