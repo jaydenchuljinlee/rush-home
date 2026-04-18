@@ -1,6 +1,6 @@
 # HomeRun 프로젝트 진행 현황
 
-> 마지막 업데이트: 2026-04-17
+> 마지막 업데이트: 2026-04-18
 
 ---
 
@@ -32,7 +32,7 @@
 
 - [x] GitHub 리포지토리 생성 (`rush-home`)
 - [x] Git LFS 설치 및 초기화 (`brew install git-lfs && git lfs install`)
-- [x] uvx 설치 (`brew install uv` -- Coplay MCP ���존성)
+- [x] uvx 설치 (`brew install uv` -- Coplay MCP 의존성)
 - [x] Unity 전용 `.gitignore` 생성 (Library/, Temp/, Builds/ 등 제외)
 - [x] Git LFS `.gitattributes` 생성 (png, wav, mp3, fbx 등 바이너리 에셋 추적)
 - [x] `.claude/` 에이전트/규칙/커맨드를 Unity 프로젝트에 맞게 재구성
@@ -52,7 +52,7 @@
   ```
   https://github.com/CoplayDev/unity-plugin.git#beta
   ```
-- [ ] **PlayFab 계정 ���성** -- https://playfab.com
+- [ ] **PlayFab 계정 생성** -- https://playfab.com
 
 ---
 
@@ -60,9 +60,9 @@
 
 | Phase | 내용 | 상태 |
 |---|---|---|
-| Phase 1 | 프로토타입 (이동/점프/장애물/게임오버) | 대기 (Unity 설치 후 시작) |
-| Phase 2 | 핵심 시스템 (청크 맵, 난이도, 오브젝트 풀링) | 대기 |
-| Phase 3 | 아트 & UX (에셋, 애니메이션, UI, 사���드) | 대기 |
+| Phase 1 | 프로토타입 (이동/점프/장애물/게임오버) | 완료 |
+| Phase 2 | 핵심 시스템 (청크 맵, 난이도, 오브젝트 풀링) | 완료 |
+| Phase 3 | 아트 & UX (에셋, 애니메이션, UI, 사운드) | 대기 |
 | Phase 4 | 서버 연동 (PlayFab 인증/리더보드) | 대기 |
 | Phase 5 | 폴리싱 & 출시 준비 | 대기 |
 
@@ -70,6 +70,7 @@
 
 ## 다음 할 일
 
-1. Phase 1 프로토타입 시작 -- 캐릭터 이동/점프/슬라이딩 구현
-2. 기본 장애물 1종 + 충돌 처리
-3. 게임오버 / 재시작
+1. Phase 3 시작 -- 캐릭터 애니메이션 (달리기/점프/슬라이딩/데스)
+2. 배경 파랄랙스 스크롤링
+3. UI 개선 (메인메뉴/게임오버/결과 화면)
+4. 사운드 추가 (BGM, SFX)
