@@ -18,7 +18,10 @@ model: sonnet
 
 1. 계획서(`.claude/plans/`)의 "2. 영향도 분석" 파일 목록을 먼저 읽는다.
 2. `git diff`로 실제 변경 범위를 파악한다.
-3. **계획서 파일에 한정하여** 아래 5가지를 검증한다.
+3. **Coplay MCP로 Unity 에디터 상태를 검증한다:**
+   - `mcp__coplay-mcp__check_compile_errors` -- 컴파일 에러 없는지 확인
+   - `mcp__coplay-mcp__get_unity_logs` (show_errors: true, show_warnings: true) -- 에디터 경고/에러 확인
+4. **계획서 파일에 한정하여** 아래 5가지를 검증한다.
 
 ## 검증 항목
 
