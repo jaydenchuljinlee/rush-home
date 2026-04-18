@@ -120,52 +120,15 @@ mcp__coplay-mcp__check_compile_errors
 
 ## Phase 5: 에디터 플레이 검증
 
-코드 검증 통과 후, Coplay MCP로 Unity 에디터에서 직접 플레이하여 결과를 확인한다.
+`@play-verifier` 서브에이전트를 실행한다.
 
-### Step 1: 씬 상태 확인
+- 프롬프트: "`.claude/plans/{파일명}.md` 계획서를 기준으로 Unity 에디터에서 플레이 검증을 수행하세요. 구현된 기능이 실제로 동작하는지 확인하고, 스크린샷을 캡처하세요."
 
-```
-mcp__coplay-mcp__list_game_objects_in_hierarchy (onlyPaths: false)
-```
-
-씬에 필요한 오브젝트와 컴포넌트가 모두 존재하는지 확인한다. CLAUDE.md의 "컴포넌트 부착 확인 필수" 규칙을 따른다.
-
-### Step 2: 게임 실행
-
-```
-mcp__coplay-mcp__play_game
-```
-
-### Step 3: 에러 확인
-
-3~5초 대기 후:
-
-```
-mcp__coplay-mcp__get_unity_logs (show_errors: true, show_warnings: true, limit: 20)
-```
-
-### Step 4: 스크린샷 캡처
-
-```
-mcp__coplay-mcp__capture_scene_object
-```
-
-사용자가 변경사항을 눈으로 확인할 수 있도록 스크린샷을 캡처한다.
-
-### Step 5: 플레이 종료
-
-```
-mcp__coplay-mcp__stop_game
-```
-
-### 분기
-
-- 에러 없음 + 스크린샷 정상 -> 계획서 Phase -> DONE, 최종 보고서에 스크린샷 포함
-- 에러 발생 -> 에러 내용을 분석하여:
-  - `[INPUT]` Input System 설정 문제 -> execute_script로 수정 후 재실행
-  - `[NULL_REF]` 컴포넌트 누락 -> add_component로 수정 후 save_scene -> 재실행
-  - `[SCENE_SETUP]` 씬 구성 문제 -> 수정 후 재실행 (최대 2회)
-  - 2회 실패 시 사용자 에스컬레이션
+**분기**:
+- PASS -> 계획서 Phase -> DONE, 최종 보고서에 플레이 검증 결과 및 스크린샷 포함
+- FAIL -> 에러 유형에 따라:
+  - `[COMPILE]` / `[NULL_REF]` / `[INPUT]` -> play-verifier가 자체 수정 후 재시도 (최대 2회)
+  - `[SCENE_SETUP]` -> 사용자 에스컬레이션
 
 ---
 
