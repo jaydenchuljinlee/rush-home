@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public enum GameState
 {
@@ -51,7 +52,9 @@ public class GameManager : MonoBehaviour
         // Ready 상태에서 아무 입력이나 들어오면 게임 시작
         if (CurrentState == GameState.Ready)
         {
-            if (Input.anyKeyDown || Input.touchCount > 0)
+            bool anyKey = Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame;
+            bool anyTouch = Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame;
+            if (anyKey || anyTouch)
             {
                 StartGame();
             }
