@@ -84,112 +84,125 @@ HomeRun/
 ### 전체 파이프라인 흐름도
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        사용자 커맨드                              │
-├──────────┬──────────┬───────────────┬───────────────────────────┤
-│          │          │               │                           │
-▼          ▼          ▼               ▼                           │
-/feature   /bug       /play           /feature                    │
- -maker    -fixer     (6 modes)       -check                     │
-│          │                          │                           │
-│          │                     git 상태 점검                     │
-│          │                     브랜치 머지/정리                   │
-│          │                     PR 안내                           │
-│          │                                                      │
-▼          ▼                                                      │
-┌─────────────────────┐   ┌──────────────────────┐               │
-│ feature-orchestrator │   │ bug-fix-orchestrator  │               │
-│     (6 Phases)       │   │     (3 Phases)        │               │
-└──────────┬──────────┘   └──────────┬───────────┘               │
-           │                         │                            │
-           ▼                         ▼                            │
-┌──────────────────────────────────────────────────┐              │
-│              서브 에이전트 풀                       │              │
-│                                                  │              │
-│  ┌─────────────────┐  ┌────────────────────┐     │              │
-│  │ feature-planner  │  │ bug-diagnostician  │     │              │
-│  │   (계획 수립)     │  │   (버그 진단)       │     │              │
-│  └─────────────────┘  └────────────────────┘     │              │
-│                                                  │              │
-│  ┌──────────────────────────────────────────┐    │              │
-│  │         feature-implementer              │    │              │
-│  │          (코드 구현, 공용)                 │    │              │
-│  └──────────────────────────────────────────┘    │              │
-│                                                  │              │
-│  ┌─────────────────┐  ┌────────────────────┐     │              │
-│  │   test-runner    │  │ test-failure       │     │              │
-│  │  (테스트 실행)    │  │  -analyzer (분석)   │     │              │
-│  └─────────────────┘  └────────────────────┘     │              │
-│                                                  │              │
-│  ┌─────────────────┐  ┌────────────────────┐     │              │
-│  │ code-validator   │  │  play-verifier     │     │              │
-│  │  (코드 검증)      │  │  (플레이 검증)      │     │              │
-│  └─────────────────┘  └────────────────────┘     │              │
-│                                                  │              │
-└──────────────────────────────────────────────────┘              │
-                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+                          User Commands
+  ┌──────────────┬──────────────┬──────────────┬──────────────┐
+  │              │              │              │              │
+  ▼              ▼              ▼              ▼              ▼
+/feature      /bug           /play        /feature     /git-pull
+ -maker       -fixer       (7 modes)      -check       -request
+  │              │                           │              │
+  │              │                       Git Status      Create PR
+  │              │                       Merge/Clean     via gh CLI
+  │              │
+  ▼              ▼
+┌────────────────────┐    ┌────────────────────┐
+│ feature-            │    │ bug-fix-            │
+│   orchestrator      │    │   orchestrator      │
+│   (6 Phases)        │    │   (3 Phases)        │
+└─────────┬──────────┘    └─────────┬──────────┘
+          │                         │
+          └────────────┬────────────┘
+                       ▼
+  ┌────────────────────────────────────────────────────┐
+  │                  Sub-Agent Pool                    │
+  │                                                    │
+  │  ┌──────────────────┐    ┌──────────────────┐      │
+  │  │ feature-planner   │    │ bug-diagnostician │      │
+  │  │ Plan & Design     │    │ Reproduce & Diag  │      │
+  │  └──────────────────┘    └──────────────────┘      │
+  │                                                    │
+  │  ┌─────────────────────────────────────────┐       │
+  │  │          feature-implementer            │       │
+  │  │          Code Implementation (shared)   │       │
+  │  └─────────────────────────────────────────┘       │
+  │                                                    │
+  │  ┌──────────────────┐    ┌──────────────────┐      │
+  │  │ test-runner       │    │ test-failure-     │      │
+  │  │ Write & Run Tests │    │   analyzer        │      │
+  │  └──────────────────┘    └──────────────────┘      │
+  │                                                    │
+  │  ┌──────────────────┐    ┌──────────────────┐      │
+  │  │ code-validator    │    │ play-verifier     │      │
+  │  │ Convention Check  │    │ Unity Play Test   │      │
+  │  └──────────────────┘    └──────────────────┘      │
+  │                                                    │
+  └────────────────────────────────────────────────────┘
 ```
 
 ### Feature 구현 파이프라인 (`/feature-maker`)
 
 ```
 /feature-maker
-    │
-    ├── Step 0: 사전 점검 (브랜치/상태/PROGRESS.md)
-    │
-    └── Step 1: feature-orchestrator 실행
-         │
-         ├── Phase 1 ─── feature-planner ──────── 계획서 생성
-         │                                         (.claude/plans/*.md)
-         │
-         ├── Phase 2 ─── feature-implementer ───── C# 코드 구현
-         │                    ▲                     
-         │                    │ 회귀 (최대 3+2회)     
-         │                    │                     
-         ├── Phase 3 ─── test-runner ──────────── 테스트 작성/실행
-         │                    │                     
-         │                    ├── [PASS] → 다음 Phase
-         │                    ├── [FAIL:IMPL] → Phase 2 회귀
-         │                    ├── [FAIL:TEST] → 테스트 자체 수정
-         │                    └── [FAIL:ENV] → test-failure-analyzer
-         │                                          │
-         │                                    원인 분류 후 분기
-         │
-         ├── Phase 4 ─── code-validator ──────── 컨벤션/성능 검증
-         │                    │
-         │                    ├── [PASS] → 다음 Phase
-         │                    └── [FAIL] → Phase 2 회귀
-         │
-         ├── Phase 5 ─── play-verifier ────────── Unity 플레이 검증
-         │                    │                    (Coplay MCP)
-         │                    ├── [PASS] → 다음 Phase
-         │                    └── [FAIL] → 자체 수정 (최대 2회)
-         │
-         └── Phase 6 ─── play-suite.md 등록 ──── 완료 보고서 반환
+│
+├─ Step 0: Pre-check (branch / status / PROGRESS.md)
+│
+└─ Step 1: feature-orchestrator
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 1 │ feature-planner ─────────── Plan (.claude/plans/*.md)
+   │  └─────────┘
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 2 │ feature-implementer ─────── C# Implementation
+   │  └─────────┘
+   │       ▲
+   │       │ Regression (max 3+2)
+   │       │
+   │  ┌─────────┐
+   ├─ │ Phase 3 │ test-runner ─────────────── Write & Run Tests
+   │  └─────────┘
+   │       │
+   │       ├─ PASS ──────────────────────── Next Phase
+   │       ├─ FAIL [IMPL] ──────────────── Regress to Phase 2
+   │       ├─ FAIL [TEST] ──────────────── Self-fix test code
+   │       └─ FAIL [ENV] ───────────────── test-failure-analyzer
+   │                                            │
+   │                                       Classify & Route
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 4 │ code-validator ──────────── Convention & Perf Check
+   │  └─────────┘
+   │       │
+   │       ├─ PASS ──────────────────────── Next Phase
+   │       └─ FAIL ──────────────────────── Regress to Phase 2
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 5 │ play-verifier ───────────── Unity Play Test (Coplay MCP)
+   │  └─────────┘
+   │       │
+   │       ├─ PASS ──────────────────────── Next Phase
+   │       └─ FAIL ──────────────────────── Self-fix (max 2)
+   │
+   │  ┌─────────┐
+   └─ │ Phase 6 │ Register play-suite.md ──── Final Report
+      └─────────┘
 ```
 
 ### 버그 수정 파이프라인 (`/bug-fixer`)
 
 ```
 /bug-fixer
-    │
-    ├── Step 0: bugfix/* 브랜치 생성
-    │
-    └── Step 1: bug-fix-orchestrator 실행
-         │
-         ├── Phase 1 ─── bug-diagnostician ────── 재현 → 원인 분석
-         │                                         수정 계획서 생성
-         │
-         ├── Phase 2 ─── feature-implementer ───── 수정 코드 구현
-         │                    ▲
-         │                    │ 회귀 (최대 3회)
-         │                    │
-         └── Phase 3 ─── test-runner ──────────── 회귀 테스트
-                              │                    + 수정 확인 테스트
-                              │
-                              ├── [PASS] → 완료 보고서 반환
-                              └── [FAIL:IMPL] → Phase 2 회귀
+│
+├─ Step 0: Create bugfix/* branch
+│
+└─ Step 1: bug-fix-orchestrator
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 1 │ bug-diagnostician ───────── Reproduce & Root Cause
+   │  └─────────┘                              Fix Plan (.claude/plans/*.md)
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 2 │ feature-implementer ─────── Apply Fix
+   │  └─────────┘
+   │       ▲
+   │       │ Regression (max 3)
+   │       │
+   │  ┌─────────┐
+   └─ │ Phase 3 │ test-runner ─────────────── Regression + Verification
+      └─────────┘
+           │
+           ├─ PASS ──────────────────────── Final Report
+           └─ FAIL [IMPL] ──────────────── Regress to Phase 2
 ```
 
 ### 슬래시 커맨드 요약
