@@ -917,8 +917,8 @@ MonoBehaviour:
   spawnIntervalMin: 1.5
   spawnIntervalMax: 3
   spawnX: 12
-  groundObstacleY: -2
-  airObstacleY: 0
+  groundObstacleY: 0
+  airObstacleY: 1.5
 --- !u!4 &1879098096
 Transform:
   m_ObjectHideFlags: 0
@@ -981,6 +981,26 @@ PrefabInstance:
     - target: {fileID: 127063146217753640, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2594261420794677408, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      propertyPath: m_Size.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2594261420794677408, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932984001013964525, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932984001013964525, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 76ddba5731c37428f93db15e2ff0e258, type: 3}
+    - target: {fileID: 5932984001013964525, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9130572012494687464, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
       propertyPath: m_Name
