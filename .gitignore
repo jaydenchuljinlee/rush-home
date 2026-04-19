@@ -67,3 +67,9 @@ secrets.*
 
 # Claude plans (local only)
 .claude/plans/
+
+# Claude local settings
+.claude/settings.local.json
+
+# Coplay MCP runtime data
+HomeRun/Packages/Coplay/
