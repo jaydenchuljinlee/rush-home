@@ -72,7 +72,7 @@ public class GameUIController : MonoBehaviour
             GameManager.Instance.RestartGame();
     }
 
-    private string FormatTime(float time)
+    public static string FormatTime(float time)
     {
         int minutes = (int)(time / 60f);
         int seconds = (int)(time % 60f);

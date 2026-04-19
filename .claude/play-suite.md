@@ -35,3 +35,9 @@
 - 검증: 장애물이 스폰되어 왼쪽으로 이동
 - 대기: 5초
 - 판정: 씬에 GroundObstacle 또는 AirObstacle 인스턴스 1개 이상 존재
+
+## F-05: 인게임 HUD / 게임오버
+- 오브젝트: Canvas, Canvas/ReadyPanel, Canvas/GameOverPanel, Canvas/TimeText
+- 검증: Ready→Playing→GameOver 전체 UI 흐름 동작 (ReadyPanel 숨김, 시간 카운트, GameOverPanel 표시)
+- 대기: 3초
+- 판정: Playing 상태에서 ReadyPanel 비활성화 + TimeText 값 변화, GameOver 호출 후 GameOverPanel 활성화
