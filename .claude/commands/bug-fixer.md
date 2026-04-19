@@ -13,17 +13,33 @@ HomeRun Unity 게임 버그 수정 파이프라인을 시작합니다.
 
 ## Step 0: Git 브랜치 준비
 
-1. **현재 브랜치 확인**: 작업 중인 feature 브랜치가 있으면 해당 브랜치에서 bugfix 브랜치를 생성한다.
-2. **bugfix 브랜치 생성**:
+1. **현재 브랜치 확인**:
+   ```bash
+   git branch --show-current
+   git status --short
+   ```
+
+2. **브랜치 유형별 처리**:
+
+   | 현재 브랜치 | 처리 |
+   |------------|------|
+   | `feature/*` | 이 feature 브랜치에서 bugfix 브랜치를 생성한다 (정상) |
+   | `bugfix/*` | 이미 bugfix 중이므로 새 브랜치 없이 현재 브랜치에서 수정 |
+   | `main` | **경고** — "feature 브랜치에서 작업하세요. `/feature-check`를 실행하세요." → **중단** |
+
+3. **미커밋 변경사항 확인**:
+   변경 파일이 있으면 `/feature-check`로 먼저 정리하도록 안내하고 **중단**한다.
+
+4. **bugfix 브랜치 생성** (현재 `feature/*`인 경우):
+   - 상위 feature 브랜치를 기억해둔다 (머지 대상)
    - 브랜치명을 kebab-case로 결정한다.
      - 예: "플레이어 점프가 안 됨" → `bugfix/player-jump`
      - 예: "게임오버 UI가 안 뜸" → `bugfix/gameover-ui`
-   - 접두사는 항상 `bugfix/`를 사용한다.
    ```bash
    git checkout -b bugfix/{브랜치명}
    ```
 
-3. **확인**: `git branch --show-current`로 bugfix 브랜치에 있는지 확인한다.
+5. **확인**: `git branch --show-current`로 bugfix 브랜치에 있는지 확인한다.
 
 ---
 
@@ -33,25 +49,24 @@ HomeRun Unity 게임 버그 수정 파이프라인을 시작합니다.
 
 - 프롬프트: "$ARGUMENTS 버그를 진단하고 수정해주세요."
 
-## Step 2: 커밋 및 Push
+## Step 2: 커밋
 
-에이전트가 완료 보고서를 반환하면, 변경사항을 커밋하고 원격에 push한다.
+에이전트가 완료 보고서를 반환하면, 변경사항을 커밋한다.
 
-1. **변경 파일 확인 및 커밋**:
+1. **변경 파일 확인 및 커밋** (bugfix 관련 파일만 명시적으로 add):
    ```bash
-   git add -A
+   git add {수정된 파일들}
    git commit -m "fix: {버그 수정 요약}"
    ```
 
-2. **원격 push**:
-   ```bash
-   git push -u origin bugfix/{브랜치명}
+2. 사용자에게 완료 보고서를 전달하고, 정리를 안내한다:
+   ```
+   bugfix가 완료되었습니다.
+   `/feature-check`로 상위 feature 브랜치에 머지하세요.
    ```
 
-3. 사용자에게 완료 보고서를 전달하고, PR 생성 여부를 안내한다:
-   ```
-   PR을 생성하려면 `/git-pull-request`를 실행하세요.
-   ```
+**중요:** bugfix 브랜치에서는 PR을 생성하지 않는다.
+bugfix는 상위 feature 브랜치로 `git merge`하는 것이 정상 흐름이다.
 
 ---
 
@@ -72,6 +87,9 @@ HomeRun Unity 게임 버그 수정 파이프라인을 시작합니다.
 - 수정 확인 테스트: PASS (N개)
 
 ### 회귀 횟수: N회
+
+### 다음 단계
+`/feature-check`로 상위 feature 브랜치에 머지하세요.
 
 ---
 
