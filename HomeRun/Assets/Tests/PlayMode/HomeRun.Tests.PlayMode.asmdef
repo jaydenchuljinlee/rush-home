@@ -2,7 +2,8 @@
     "name": "HomeRun.Tests.PlayMode",
     "rootNamespace": "",
     "references": [
-        "UnityEngine.TestRunner"
+        "UnityEngine.TestRunner",
+        "HomeRun.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
