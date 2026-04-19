@@ -63,7 +63,7 @@ public class GameUIController : MonoBehaviour
                 if (gameOverPanel != null) gameOverPanel.SetActive(true);
                 if (timeText != null) timeText.gameObject.SetActive(false);
                 if (finalTimeText != null)
-                    finalTimeText.text = "Time: " + FormatTime(GameManager.Instance.ElapsedTime);
+                    finalTimeText.text = FormatTime(GameManager.Instance.ElapsedTime);
                 break;
         }
     }
