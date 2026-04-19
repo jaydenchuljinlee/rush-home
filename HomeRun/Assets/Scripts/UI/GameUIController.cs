@@ -56,10 +56,12 @@ public class GameUIController : MonoBehaviour
             case GameState.Playing:
                 if (readyPanel != null) readyPanel.SetActive(false);
                 if (gameOverPanel != null) gameOverPanel.SetActive(false);
+                if (timeText != null) timeText.gameObject.SetActive(true);
                 break;
 
             case GameState.GameOver:
                 if (gameOverPanel != null) gameOverPanel.SetActive(true);
+                if (timeText != null) timeText.gameObject.SetActive(false);
                 if (finalTimeText != null)
                     finalTimeText.text = FormatTime(GameManager.Instance.ElapsedTime);
                 break;
@@ -72,7 +74,7 @@ public class GameUIController : MonoBehaviour
             GameManager.Instance.RestartGame();
     }
 
-    private string FormatTime(float time)
+    public static string FormatTime(float time)
     {
         int minutes = (int)(time / 60f);
         int seconds = (int)(time % 60f);
