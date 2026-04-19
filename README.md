@@ -74,6 +74,190 @@ HomeRun/
 | 4 | 서버 연동 (PlayFab 인증/리더보드) | 대기 |
 | 5 | 폴리싱 & 출시 준비 | 대기 |
 
+---
+
+## AI 에이전트 파이프라인
+
+이 프로젝트는 **Claude Code + Coplay MCP** 기반의 자동화된 개발 파이프라인으로 구현됩니다.
+사용자는 슬래시 커맨드로 파이프라인을 실행하고, 에이전트들이 계획 → 구현 → 테스트 → 검증을 자동 수행합니다.
+
+### 전체 파이프라인 흐름도
+
+```
+                          User Commands
+  ┌──────────────┬──────────────┬──────────────┬──────────────┐
+  │              │              │              │              │
+  ▼              ▼              ▼              ▼              ▼
+/feature      /bug           /play        /feature     /git-pull
+ -maker       -fixer       (7 modes)      -check       -request
+  │              │                           │              │
+  │              │                       Git Status      Create PR
+  │              │                       Merge/Clean     via gh CLI
+  │              │
+  ▼              ▼
+┌────────────────────┐    ┌────────────────────┐
+│ feature-            │    │ bug-fix-            │
+│   orchestrator      │    │   orchestrator      │
+│   (6 Phases)        │    │   (3 Phases)        │
+└─────────┬──────────┘    └─────────┬──────────┘
+          │                         │
+          └────────────┬────────────┘
+                       ▼
+  ┌────────────────────────────────────────────────────┐
+  │                  Sub-Agent Pool                    │
+  │                                                    │
+  │  ┌──────────────────┐    ┌──────────────────┐      │
+  │  │ feature-planner   │    │ bug-diagnostician │      │
+  │  │ Plan & Design     │    │ Reproduce & Diag  │      │
+  │  └──────────────────┘    └──────────────────┘      │
+  │                                                    │
+  │  ┌─────────────────────────────────────────┐       │
+  │  │          feature-implementer            │       │
+  │  │          Code Implementation (shared)   │       │
+  │  └─────────────────────────────────────────┘       │
+  │                                                    │
+  │  ┌──────────────────┐    ┌──────────────────┐      │
+  │  │ test-runner       │    │ test-failure-     │      │
+  │  │ Write & Run Tests │    │   analyzer        │      │
+  │  └──────────────────┘    └──────────────────┘      │
+  │                                                    │
+  │  ┌──────────────────┐    ┌──────────────────┐      │
+  │  │ code-validator    │    │ play-verifier     │      │
+  │  │ Convention Check  │    │ Unity Play Test   │      │
+  │  └──────────────────┘    └──────────────────┘      │
+  │                                                    │
+  └────────────────────────────────────────────────────┘
+```
+
+### Feature 구현 파이프라인 (`/feature-maker`)
+
+```
+/feature-maker
+│
+├─ Step 0: Pre-check (branch / status / PROGRESS.md)
+│
+└─ Step 1: feature-orchestrator
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 1 │ feature-planner ─────────── Plan (.claude/plans/*.md)
+   │  └─────────┘
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 2 │ feature-implementer ─────── C# Implementation
+   │  └─────────┘
+   │       ▲
+   │       │ Regression (max 3+2)
+   │       │
+   │  ┌─────────┐
+   ├─ │ Phase 3 │ test-runner ─────────────── Write & Run Tests
+   │  └─────────┘
+   │       │
+   │       ├─ PASS ──────────────────────── Next Phase
+   │       ├─ FAIL [IMPL] ──────────────── Regress to Phase 2
+   │       ├─ FAIL [TEST] ──────────────── Self-fix test code
+   │       └─ FAIL [ENV] ───────────────── test-failure-analyzer
+   │                                            │
+   │                                       Classify & Route
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 4 │ code-validator ──────────── Convention & Perf Check
+   │  └─────────┘
+   │       │
+   │       ├─ PASS ──────────────────────── Next Phase
+   │       └─ FAIL ──────────────────────── Regress to Phase 2
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 5 │ play-verifier ───────────── Unity Play Test (Coplay MCP)
+   │  └─────────┘
+   │       │
+   │       ├─ PASS ──────────────────────── Next Phase
+   │       └─ FAIL ──────────────────────── Self-fix (max 2)
+   │
+   │  ┌─────────┐
+   └─ │ Phase 6 │ Register play-suite.md ──── Final Report
+      └─────────┘
+```
+
+### 버그 수정 파이프라인 (`/bug-fixer`)
+
+```
+/bug-fixer
+│
+├─ Step 0: Create bugfix/* branch
+│
+└─ Step 1: bug-fix-orchestrator
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 1 │ bug-diagnostician ───────── Reproduce & Root Cause
+   │  └─────────┘                              Fix Plan (.claude/plans/*.md)
+   │
+   │  ┌─────────┐
+   ├─ │ Phase 2 │ feature-implementer ─────── Apply Fix
+   │  └─────────┘
+   │       ▲
+   │       │ Regression (max 3)
+   │       │
+   │  ┌─────────┐
+   └─ │ Phase 3 │ test-runner ─────────────── Regression + Verification
+      └─────────┘
+           │
+           ├─ PASS ──────────────────────── Final Report
+           └─ FAIL [IMPL] ──────────────── Regress to Phase 2
+```
+
+### 슬래시 커맨드 요약
+
+| 커맨드 | 설명 | 호출 에이전트 |
+|--------|------|-------------|
+| `/feature-maker` | 기능 구현 전체 파이프라인 | feature-orchestrator (6 phases) |
+| `/bug-fixer` | 버그 진단 → 수정 → 검증 | bug-fix-orchestrator (3 phases) |
+| `/feature-check` | 브랜치 상태 점검, 머지/PR 안내 | 없음 (직접 처리) |
+| `/play` | Unity 게임 플레이 및 검증 | 없음 (Coplay MCP 직접 호출) |
+| `/git-pull-request` | PR 초안 생성 및 GitHub PR 생성 | 없음 (gh CLI 호출) |
+
+### `/play` 모드
+
+| 모드 | 설명 |
+|------|------|
+| `check` | 3초 플레이 후 에러 로그 + 스크린샷 (기본) |
+| `watch` | N초 동안 시간별로 변화 관찰 |
+| `test` | 특정 기능 동작 검증 |
+| `repro` | 버그 재현 및 증상 기록 |
+| `free` | 플레이만 시작, 사용자 직접 조작 |
+| `suite` | `.claude/play-suite.md` 기반 전체 기능 순차 검증 |
+| `fix` | `.claude/bugs/` open 리포트 순차 수정 |
+
+### 서브 에이전트 역할
+
+| 에이전트 | 모델 | 역할 |
+|----------|------|------|
+| feature-planner | Opus | 기능 요구사항 분석 → 구현 계획서 작성 |
+| feature-implementer | Sonnet | 계획서 기반 C# 코드 구현 (기능/버그 공용) |
+| test-runner | Sonnet | Edit/Play Mode 테스트 작성 및 Coplay MCP로 실행 |
+| test-failure-analyzer | Opus | 테스트 실패 근본 원인 분석 및 수정 경로 제시 |
+| code-validator | Sonnet | 네이밍 컨벤션, 성능 안티패턴, 사이드 이펙트 검증 |
+| play-verifier | Sonnet | Unity 에디터에서 Coplay MCP로 실제 플레이 검증 |
+| bug-diagnostician | Opus | 버그 재현 → 근본 원인 분석 → 수정 계획서 작성 |
+
+### 브랜치 전략
+
+```
+main
+ └── feature/{기능명}        ← /feature-maker로 생성. 완료 시 PR → main
+      └── bugfix/{버그명}    ← /bug-fixer로 생성. 완료 시 merge → feature
+```
+
+### 데이터 흐름
+
+```
+docs/PROGRESS.md          ← Feature 로드맵 및 상태 추적
+.claude/plans/*.md        ← 구현/수정 계획서 (에이전트 자동 생성)
+.claude/play-suite.md     ← Feature별 플레이 검증 항목
+.claude/bugs/*.md         ← 버그 리포트 (suite FAIL 시 자동 생성)
+```
+
+---
+
 ## 타겟 유저
 
 - 20~40대 직장인
