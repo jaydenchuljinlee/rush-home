@@ -586,6 +586,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: HomeRun.Runtime::DifficultyManager
   difficultyData: {fileID: 11400000, guid: 6155564766d1543eb848c590921e0032, type: 2}
   groundScroller: {fileID: 1169615632}
+  obstacleSpawner: {fileID: 1879098095}
 --- !u!1 &665158164
 GameObject:
   m_ObjectHideFlags: 0
