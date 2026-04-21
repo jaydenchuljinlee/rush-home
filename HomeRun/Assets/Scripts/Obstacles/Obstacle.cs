@@ -25,27 +25,30 @@ public class Obstacle : MonoBehaviour, IPoolable
 
     private GroundScroller _groundScroller;
     private ObstaclePool _pool;
+    private bool _initialized;
 
     public ObstacleType ObstacleType => obstacleType;
 
     /// <summary>
     /// 스폰 시 초기화. ObstacleSpawner에서 호출.
+    /// Initialize()가 호출되지 않은 템플릿 오브젝트는 Update에서 이동하지 않는다.
     /// </summary>
     public void Initialize(float scrollSpeed, ObstaclePool pool = null)
     {
+        _initialized = true;
         _pool = pool;
-        // GroundScroller 캐싱 (한 번만)
         if (_groundScroller == null)
             _groundScroller = Object.FindFirstObjectByType<GroundScroller>();
     }
 
     private void Update()
     {
+        // 템플릿 오브젝트(Initialize 미호출)는 이동하지 않음
+        if (!_initialized) return;
+
         if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
             return;
 
-        // Ground/Air 모두 지면과 동일한 이동량 사용 (스폰 슬롯 간격 유지)
-        // Air의 차별화는 Y위치 + AirObstacleMover의 X진동으로 구현
         float moveAmount = _groundScroller != null ? _groundScroller.LastMoveAmount : 8f * Time.deltaTime;
         transform.position += Vector3.left * moveAmount;
 
