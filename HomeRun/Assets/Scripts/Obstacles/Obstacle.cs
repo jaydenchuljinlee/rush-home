@@ -23,6 +23,9 @@ public class Obstacle : MonoBehaviour, IPoolable
     [Tooltip("이 값보다 X가 작아지면 풀로 반환 (화면 왼쪽 밖)")]
     [SerializeField] private float destroyX = -15f;
 
+    [Tooltip("Air 장애물의 지면 속도 대비 이동 비율 (0.7 = 지면의 70%)")]
+    [SerializeField] private float airSpeedRatio = 0.7f;
+
     private GroundScroller _groundScroller;
     private ObstaclePool _pool;
 
@@ -44,8 +47,8 @@ public class Obstacle : MonoBehaviour, IPoolable
         if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
             return;
 
-        // GroundScroller의 현재 속도와 동기화
-        float speed = _groundScroller != null ? _groundScroller.ScrollSpeed : 8f;
+        float baseSpeed = _groundScroller != null ? _groundScroller.ScrollSpeed : 8f;
+        float speed = obstacleType == ObstacleType.Air ? baseSpeed * airSpeedRatio : baseSpeed;
         transform.position += Vector3.left * speed * Time.deltaTime;
 
         if (transform.position.x < destroyX)

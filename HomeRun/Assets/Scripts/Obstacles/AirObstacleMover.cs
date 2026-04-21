@@ -17,6 +17,9 @@ public class AirObstacleMover : MonoBehaviour
     [Tooltip("비례 계산 기준이 되는 지면 속도 (Easy 속도)")]
     [SerializeField] private float referenceSpeed = 6f;
 
+    [Tooltip("Y 위치 하한선 (이 아래로 내려가지 않음 — Ground 영역 보호)")]
+    [SerializeField] private float minY = 1.0f;
+
     private float _spawnY;
     private float _phase;
     private bool _isMoving;
@@ -55,7 +58,7 @@ public class AirObstacleMover : MonoBehaviour
         float yOffset = Mathf.Sin(_phase * freq * Mathf.PI * 2f) * amp;
 
         Vector3 pos = transform.position;
-        pos.y = _spawnY + yOffset;
+        pos.y = Mathf.Max(_spawnY + yOffset, minY);
         transform.position = pos;
     }
 
