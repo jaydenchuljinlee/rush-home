@@ -3,34 +3,39 @@ using UnityEngine;
 /// <summary>
 /// 공중 장애물(AirObstacle) 전용 Y축 왕복 이동 컴포넌트.
 /// Normal 난이도(30초) 이후부터 활성화되어 위아래로 왕복 이동한다.
-/// Easy 구간에서는 스폰 Y 위치를 그대로 유지한다.
-///
-/// 사용법:
-/// 1. AirObstacle 프리팹에 이 컴포넌트를 추가한다.
-/// 2. Inspector에서 amplitude(이동 폭)와 frequency(왕복 빈도)를 조정한다.
+/// 지면 스크롤 속도에 비례하여 이동 폭과 빈도가 증가한다.
 /// </summary>
 public class AirObstacleMover : MonoBehaviour
 {
-    [Header("이동 설정")]
-    [Tooltip("Y축 왕복 이동 폭 (유닛 거리, 양쪽으로 ±amplitude)")]
-    [SerializeField] private float amplitude = 1.5f;
+    [Header("기본 이동 설정 (Easy 속도 기준)")]
+    [Tooltip("기준 속도(Easy)에서의 Y축 왕복 폭")]
+    [SerializeField] private float baseAmplitude = 1.2f;
 
-    [Tooltip("초당 왕복 횟수 (Hz). 1이면 1초에 한 번 왕복")]
-    [SerializeField] private float frequency = 1.5f;
+    [Tooltip("기준 속도(Easy)에서의 초당 왕복 횟수")]
+    [SerializeField] private float baseFrequency = 1.2f;
+
+    [Tooltip("비례 계산 기준이 되는 지면 속도 (Easy 속도)")]
+    [SerializeField] private float referenceSpeed = 6f;
 
     private float _spawnY;
     private float _phase;
     private bool _isMoving;
+    private GroundScroller _groundScroller;
+
+    public float Amplitude => GetScaledAmplitude();
+    public float Frequency => GetScaledFrequency();
+    public bool IsMoving => _isMoving;
+    public float SpawnY => _spawnY;
 
     private void OnEnable()
     {
-        // 풀에서 꺼낼 때마다 현재 난이도를 기준으로 활성 여부 결정
         _phase = 0f;
     }
 
     private void Start()
     {
         _spawnY = transform.position.y;
+        _groundScroller = Object.FindFirstObjectByType<GroundScroller>();
         RefreshActiveState();
     }
 
@@ -39,23 +44,37 @@ public class AirObstacleMover : MonoBehaviour
         if (GameManager.Instance == null) return;
         if (GameManager.Instance.CurrentState != GameState.Playing) return;
 
-        // 매 프레임 경과 시간으로 활성 상태 재평가
         RefreshActiveState();
 
         if (!_isMoving) return;
 
+        float freq = GetScaledFrequency();
+        float amp = GetScaledAmplitude();
+
         _phase += Time.deltaTime;
-        float yOffset = Mathf.Sin(_phase * frequency * Mathf.PI * 2f) * amplitude;
+        float yOffset = Mathf.Sin(_phase * freq * Mathf.PI * 2f) * amp;
 
         Vector3 pos = transform.position;
         pos.y = _spawnY + yOffset;
         transform.position = pos;
     }
 
-    /// <summary>
-    /// 현재 경과 시간을 기준으로 이동 활성 여부를 갱신한다.
-    /// Normal 이상(30초 이후)이면 활성화.
-    /// </summary>
+    private float GetSpeedRatio()
+    {
+        if (_groundScroller == null || referenceSpeed <= 0f) return 1f;
+        return _groundScroller.ScrollSpeed / referenceSpeed;
+    }
+
+    private float GetScaledAmplitude()
+    {
+        return baseAmplitude * GetSpeedRatio();
+    }
+
+    private float GetScaledFrequency()
+    {
+        return baseFrequency * GetSpeedRatio();
+    }
+
     private void RefreshActiveState()
     {
         if (GameManager.Instance == null)
@@ -69,7 +88,6 @@ public class AirObstacleMover : MonoBehaviour
 
         if (!_isMoving && shouldMove)
         {
-            // 활성화 전환 시 현재 Y를 기준점으로 재설정
             _spawnY = transform.position.y;
             _phase = 0f;
         }
@@ -77,9 +95,8 @@ public class AirObstacleMover : MonoBehaviour
         _isMoving = shouldMove;
     }
 
-    /// <summary>
-    /// 외부에서 강제로 이동 활성화 여부를 설정한다. (테스트용)
-    /// </summary>
+    // --- 테스트/외부 설정용 ---
+
     public void SetMoving(bool active)
     {
         _isMoving = active;
@@ -90,24 +107,7 @@ public class AirObstacleMover : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 이동 폭을 런타임에 변경한다. (테스트용)
-    /// </summary>
-    public void SetAmplitude(float value)
-    {
-        amplitude = value;
-    }
-
-    /// <summary>
-    /// 왕복 빈도를 런타임에 변경한다. (테스트용)
-    /// </summary>
-    public void SetFrequency(float value)
-    {
-        frequency = value;
-    }
-
-    public float Amplitude => amplitude;
-    public float Frequency => frequency;
-    public bool IsMoving => _isMoving;
-    public float SpawnY => _spawnY;
+    public void SetAmplitude(float value) { baseAmplitude = value; }
+    public void SetFrequency(float value) { baseFrequency = value; }
+    public void SetGroundScroller(GroundScroller scroller) { _groundScroller = scroller; }
 }
