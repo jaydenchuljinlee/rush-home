@@ -20,8 +20,12 @@ public class AirObstacleMover : MonoBehaviour
     [Tooltip("Y 위치 하한선 (이 아래로 내려가지 않음 — Ground 영역 보호)")]
     [SerializeField] private float minY = 1.0f;
 
+    [Tooltip("이동 시작 시 amplitude가 최대치에 도달하는 시간 (초)")]
+    [SerializeField] private float rampUpDuration = 3f;
+
     private float _spawnY;
     private float _phase;
+    private float _rampUpTimer;
     private bool _isMoving;
     private GroundScroller _groundScroller;
 
@@ -53,6 +57,11 @@ public class AirObstacleMover : MonoBehaviour
 
         float freq = GetScaledFrequency();
         float amp = GetScaledAmplitude();
+
+        // 점진적 amplitude 증가 (ease-in)
+        _rampUpTimer += Time.deltaTime;
+        float rampFactor = rampUpDuration > 0f ? Mathf.Clamp01(_rampUpTimer / rampUpDuration) : 1f;
+        amp *= rampFactor;
 
         _phase += Time.deltaTime;
         float yOffset = Mathf.Sin(_phase * freq * Mathf.PI * 2f) * amp;
@@ -93,6 +102,7 @@ public class AirObstacleMover : MonoBehaviour
         {
             _spawnY = transform.position.y;
             _phase = 0f;
+            _rampUpTimer = 0f;
         }
 
         _isMoving = shouldMove;
