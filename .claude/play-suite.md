@@ -84,6 +84,14 @@ Suite는 **2 Phase**로 나뉜다:
 
 ---
 
+## F-DEBUG: 에디터 전용 무적 토글 (DebugCheatManager)
+- 오브젝트: DebugManager
+- 검증: F1 키 입력 시 OnPlayerHit 구독자 제거 (무적 ON), 재입력 시 복원 (무적 OFF)
+- 대기: 2초
+- 판정: 무적 ON 후 OnPlayerHit backing field == null, 무적 OFF 후 != null. DebugManager 오브젝트에 DebugCheatManager 컴포넌트 존재.
+
+---
+
 ## Phase 2: 일반 모드 (실패 케이스)
 
 ### F-05: 인게임 HUD / 게임오버
