@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bf8a182d6a4f47c1b939e70eddf38d2, type: 3}
+  m_Name: NormalPattern_GroundAir
+  m_EditorClassIdentifier: HomeRun.Runtime::LevelPatternData
+  patternName: NormalPattern_GroundAir
+  minDifficulty: 1
+  obstacles:
+  - prefab: {fileID: 6244521721278972891, guid: da080d18c13d04a02867e99fe54e3f6d, type: 3}
+    xOffset: 0
+    yOverride: -999
+  - prefab: {fileID: 9130572012494687464, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+    xOffset: 4
+    yOverride: -999

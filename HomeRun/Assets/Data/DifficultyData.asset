@@ -19,3 +19,25 @@ MonoBehaviour:
   normalThreshold: 30
   hardThreshold: 60
   extremeThreshold: 90
+  easySpawnMin: 1.5
+  easySpawnMax: 3
+  normalSpawnMin: 1.2
+  normalSpawnMax: 2.5
+  hardSpawnMin: 0.9
+  hardSpawnMax: 2
+  extremeSpawnMin: 0.6
+  extremeSpawnMax: 1.5
+  easyPatterns:
+  - {fileID: 11400000, guid: 34c0e1675cd7b4c52a459e1e0b9b821e, type: 2}
+  normalPatterns:
+  - {fileID: 11400000, guid: 34c0e1675cd7b4c52a459e1e0b9b821e, type: 2}
+  - {fileID: 11400000, guid: 542d7134886814cb2ad4c5e90d8ea91e, type: 2}
+  hardPatterns:
+  - {fileID: 11400000, guid: 34c0e1675cd7b4c52a459e1e0b9b821e, type: 2}
+  - {fileID: 11400000, guid: 542d7134886814cb2ad4c5e90d8ea91e, type: 2}
+  - {fileID: 11400000, guid: 14d8f856043bb46d2910fc3288fea4d8, type: 2}
+  extremePatterns:
+  - {fileID: 11400000, guid: 34c0e1675cd7b4c52a459e1e0b9b821e, type: 2}
+  - {fileID: 11400000, guid: 542d7134886814cb2ad4c5e90d8ea91e, type: 2}
+  - {fileID: 11400000, guid: 14d8f856043bb46d2910fc3288fea4d8, type: 2}
+  - {fileID: 11400000, guid: 4a3050462ab5e4caa9e7c467a0f439fa, type: 2}
