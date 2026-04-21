@@ -23,9 +23,6 @@ public class Obstacle : MonoBehaviour, IPoolable
     [Tooltip("이 값보다 X가 작아지면 풀로 반환 (화면 왼쪽 밖)")]
     [SerializeField] private float destroyX = -15f;
 
-    [Tooltip("Air 장애물의 지면 속도 대비 이동 비율 (0.7 = 지면의 70%)")]
-    [SerializeField] private float airSpeedRatio = 0.7f;
-
     private GroundScroller _groundScroller;
     private ObstaclePool _pool;
 
@@ -47,18 +44,10 @@ public class Obstacle : MonoBehaviour, IPoolable
         if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
             return;
 
-        if (obstacleType == ObstacleType.Ground)
-        {
-            // Ground: GroundScroller와 정확히 동일한 이동량 사용 (지면에 고정)
-            float moveAmount = _groundScroller != null ? _groundScroller.LastMoveAmount : 8f * Time.deltaTime;
-            transform.position += Vector3.left * moveAmount;
-        }
-        else
-        {
-            // Air: 지면 속도의 일정 비율로 독립 이동
-            float baseSpeed = _groundScroller != null ? _groundScroller.ScrollSpeed : 8f;
-            transform.position += Vector3.left * baseSpeed * airSpeedRatio * Time.deltaTime;
-        }
+        // Ground/Air 모두 지면과 동일한 이동량 사용 (스폰 슬롯 간격 유지)
+        // Air의 차별화는 Y위치 + AirObstacleMover의 X진동으로 구현
+        float moveAmount = _groundScroller != null ? _groundScroller.LastMoveAmount : 8f * Time.deltaTime;
+        transform.position += Vector3.left * moveAmount;
 
         if (transform.position.x < destroyX)
         {

@@ -18,11 +18,11 @@ public class AirObstacleMover : MonoBehaviour
     [Tooltip("비례 계산 기준이 되는 지면 속도 (Easy 속도)")]
     [SerializeField] private float referenceSpeed = 6f;
 
-    [Tooltip("X축 최대 진폭 상한 (이 값을 넘지 않음)")]
-    [SerializeField] private float maxAmplitude = 2.0f;
+    [Tooltip("X축 최대 진폭 상한 — 플레이어 점프 클리어런스(≈3유닛)의 절반 이내")]
+    [SerializeField] private float maxAmplitude = 1.2f;
 
     [Tooltip("초당 최대 왕복 횟수 상한")]
-    [SerializeField] private float maxFrequency = 2.0f;
+    [SerializeField] private float maxFrequency = 1.5f;
 
     [Tooltip("이동 시작 시 amplitude가 최대치에 도달하는 시간 (초)")]
     [SerializeField] private float rampUpDuration = 3f;
