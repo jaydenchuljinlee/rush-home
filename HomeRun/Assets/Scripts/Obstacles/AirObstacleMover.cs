@@ -67,7 +67,9 @@ public class AirObstacleMover : MonoBehaviour
         amp *= rampFactor;
 
         _phase += Time.deltaTime;
-        float xOffset = Mathf.Sin(_phase * freq * Mathf.PI * 2f) * amp;
+        // 오른쪽 편향 진동: (Sin+1)/2 → 범위 0~1 → *amp → 0~amp (오른쪽만)
+        // 플레이어(왼쪽)에서 멀어지는 방향으로만 이동하여 통과 창 제공
+        float xOffset = (Mathf.Sin(_phase * freq * Mathf.PI * 2f) + 1f) * 0.5f * amp;
 
         // 이전 프레임 오프셋을 빼고 새 오프셋을 더함 (delta 방식)
         float delta = xOffset - _prevOffset;
