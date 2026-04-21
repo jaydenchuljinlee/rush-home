@@ -727,6 +727,27 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &743873361 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9130572012494687464, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+  m_PrefabInstance: {fileID: 739286060613843443}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &743873366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743873361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe6f2553e5325478da2fa455b5dac426, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: HomeRun.Runtime::AirObstacleMover
+  baseAmplitude: 1.2
+  baseFrequency: 1.2
+  referenceSpeed: 6
+  minY: 1
 --- !u!1 &756928074
 GameObject:
   m_ObjectHideFlags: 0
@@ -2234,7 +2255,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9130572012494687464, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 743873366}
   m_SourcePrefab: {fileID: 100100000, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
 --- !u!1001 &4224352758209758076
 PrefabInstance:
