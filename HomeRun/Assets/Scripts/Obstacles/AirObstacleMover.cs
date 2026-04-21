@@ -13,10 +13,10 @@ public class AirObstacleMover : MonoBehaviour
 {
     [Header("이동 설정")]
     [Tooltip("Y축 왕복 이동 폭 (유닛 거리, 양쪽으로 ±amplitude)")]
-    [SerializeField] private float amplitude = 0.8f;
+    [SerializeField] private float amplitude = 1.5f;
 
     [Tooltip("초당 왕복 횟수 (Hz). 1이면 1초에 한 번 왕복")]
-    [SerializeField] private float frequency = 0.8f;
+    [SerializeField] private float frequency = 1.5f;
 
     private float _spawnY;
     private float _phase;
