@@ -1,9 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// 일정 간격으로 장애물을 랜덤 스폰하는 스포너.
-/// 바닥 장애물(Ground)과 공중 장애물(Air) 프리팹을 모두 지원하며
-/// ObstaclePool을 통해 오브젝트를 재사용한다.
+/// 거리 기반 슬롯 시스템으로 장애물을 스폰하는 스포너.
+/// 지면이 일정 거리 스크롤할 때마다 하나의 슬롯을 생성하고,
+/// 그 슬롯에 Ground 또는 Air 중 하나를 배치한다.
+/// 슬롯 간 최소 X 간격이 보장되어 겹침이 발생하지 않는다.
 /// </summary>
 public class ObstacleSpawner : MonoBehaviour
 {
@@ -14,9 +15,11 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField] private GroundScroller groundScroller;
     [SerializeField] private ObstaclePool obstaclePool;
 
-    [Header("스폰 설정")]
-    [SerializeField] private float spawnIntervalMin = 1.5f;
-    [SerializeField] private float spawnIntervalMax = 3f;
+    [Header("슬롯 설정")]
+    [Tooltip("슬롯 간 최소 X 거리 (지면 스크롤 기준)")]
+    [SerializeField] private float slotSpacingMin = 5f;
+    [Tooltip("슬롯 간 최대 X 거리")]
+    [SerializeField] private float slotSpacingMax = 10f;
     [SerializeField] private float spawnX = 12f;
 
     [Header("Y 위치 설정")]
@@ -25,11 +28,14 @@ public class ObstacleSpawner : MonoBehaviour
     [Tooltip("공중 장애물 스폰 Y (플레이어 머리 위)")]
     [SerializeField] private float airObstacleY = 1.5f;
 
-    private float _spawnTimer;
+    /// <summary>마지막 스폰 이후 누적 이동 거리</summary>
+    private float _distanceSinceLastSpawn;
+    /// <summary>다음 스폰까지 필요한 거리</summary>
+    private float _nextSlotDistance;
 
     private void Start()
     {
-        ResetTimer();
+        ResetSlotDistance();
     }
 
     private void OnEnable()
@@ -47,11 +53,15 @@ public class ObstacleSpawner : MonoBehaviour
         if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
             return;
 
-        _spawnTimer -= Time.deltaTime;
-        if (_spawnTimer <= 0f)
+        // 지면이 이동한 거리를 누적
+        float moveAmount = groundScroller != null ? groundScroller.LastMoveAmount : 8f * Time.deltaTime;
+        _distanceSinceLastSpawn += moveAmount;
+
+        if (_distanceSinceLastSpawn >= _nextSlotDistance)
         {
             SpawnObstacle();
-            ResetTimer();
+            _distanceSinceLastSpawn = 0f;
+            ResetSlotDistance();
         }
     }
 
@@ -59,7 +69,7 @@ public class ObstacleSpawner : MonoBehaviour
     {
         if (obstaclePrefabs == null || obstaclePrefabs.Length == 0) return;
 
-        // 랜덤으로 프리팹 선택
+        // 랜덤으로 프리팹 선택 (Ground 또는 Air)
         int index = Random.Range(0, obstaclePrefabs.Length);
         GameObject prefab = obstaclePrefabs[index];
         if (prefab == null) return;
@@ -81,7 +91,6 @@ public class ObstacleSpawner : MonoBehaviour
         }
         else
         {
-            // 풀 없을 경우 Instantiate 폴백
             GameObject go = Instantiate(prefab, spawnPos, Quaternion.identity);
             obstacle = go.GetComponent<Obstacle>();
         }
@@ -94,31 +103,32 @@ public class ObstacleSpawner : MonoBehaviour
     }
 
     /// <summary>
-    /// 난이도 매니저에서 호출. 스폰 간격 범위를 갱신한다.
-    /// 현재 타이머가 새 최대값보다 크면 즉시 클램프.
+    /// 난이도 매니저에서 호출. 시간 간격(초)을 거리 간격으로 변환하여 적용.
     /// </summary>
-    public void SetSpawnInterval(float min, float max)
+    public void SetSpawnInterval(float minTime, float maxTime)
     {
-        spawnIntervalMin = min;
-        spawnIntervalMax = max;
+        float speed = groundScroller != null ? groundScroller.ScrollSpeed : 8f;
+        slotSpacingMin = minTime * speed;
+        slotSpacingMax = maxTime * speed;
 
-        // 현재 타이머가 새 최대값을 초과하면 클램프
-        if (_spawnTimer > spawnIntervalMax)
+        // 현재 남은 거리가 새 최대값을 초과하면 클램프
+        if (_nextSlotDistance > slotSpacingMax)
         {
-            _spawnTimer = spawnIntervalMax;
+            _nextSlotDistance = slotSpacingMax;
         }
     }
 
-    private void ResetTimer()
+    private void ResetSlotDistance()
     {
-        _spawnTimer = Random.Range(spawnIntervalMin, spawnIntervalMax);
+        _nextSlotDistance = Random.Range(slotSpacingMin, slotSpacingMax);
     }
 
     private void HandleGameStateChanged(GameState state)
     {
         if (state == GameState.Playing)
         {
-            ResetTimer();
+            _distanceSinceLastSpawn = 0f;
+            ResetSlotDistance();
         }
     }
 }
