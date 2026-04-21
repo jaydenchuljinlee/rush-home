@@ -1,9 +1,14 @@
 using UnityEngine;
 
 /// <summary>
-/// 경과 시간에 따라 난이도(스크롤 속도)를 조절하는 싱글톤 매니저.
-/// DifficultyData ScriptableObject에서 단계별 속도 값을 읽어 GroundScroller에 적용.
-/// GroundScroller는 F-02에서 Inspector 할당.
+/// 경과 시간에 따라 난이도(스크롤 속도 + 장애물 스폰 빈도)를 조절하는 싱글톤 매니저.
+/// DifficultyData ScriptableObject에서 단계별 값을 읽어 GroundScroller, ObstacleSpawner에 적용.
+///
+/// 난이도 단계:
+/// Easy    : 0 ~ 30초   (속도 6,  스폰 1.5 ~ 3.0초)
+/// Normal  : 30 ~ 60초  (속도 8,  스폰 1.2 ~ 2.5초)
+/// Hard    : 60 ~ 120초 (속도 11, 스폰 0.9 ~ 2.0초)
+/// Extreme : 120초 이상 (속도 15, 스폰 0.6 ~ 1.5초)
 /// </summary>
 public class DifficultyManager : MonoBehaviour
 {
@@ -11,6 +16,7 @@ public class DifficultyManager : MonoBehaviour
 
     [SerializeField] private DifficultyData difficultyData;
     [SerializeField] private GroundScroller groundScroller;
+    [SerializeField] private ObstacleSpawner obstacleSpawner;
 
     private void Awake()
     {
@@ -39,20 +45,39 @@ public class DifficultyManager : MonoBehaviour
         if (difficultyData == null) return;
 
         float elapsed = GameManager.Instance.ElapsedTime;
-        float targetSpeed = difficultyData.GetSpeedForTime(elapsed);
 
+        // 스크롤 속도 적용
+        float targetSpeed = difficultyData.GetSpeedForTime(elapsed);
         if (groundScroller != null)
         {
             groundScroller.ScrollSpeed = targetSpeed;
+        }
+
+        // 장애물 스폰 간격 적용
+        var (spawnMin, spawnMax) = difficultyData.GetSpawnIntervalForTime(elapsed);
+        if (obstacleSpawner != null)
+        {
+            obstacleSpawner.SetSpawnInterval(spawnMin, spawnMax);
         }
     }
 
     private void HandleGameStateChanged(GameState state)
     {
-        // 게임 시작 시 Easy 속도로 초기화
-        if (state == GameState.Playing && difficultyData != null && groundScroller != null)
+        if (state == GameState.Playing && difficultyData != null)
         {
-            groundScroller.ScrollSpeed = difficultyData.EasySpeed;
+            // 게임 시작 시 Easy 단계로 초기화
+            if (groundScroller != null)
+            {
+                groundScroller.ScrollSpeed = difficultyData.EasySpeed;
+            }
+
+            if (obstacleSpawner != null)
+            {
+                obstacleSpawner.SetSpawnInterval(
+                    difficultyData.EasySpawnMin,
+                    difficultyData.EasySpawnMax
+                );
+            }
         }
     }
 

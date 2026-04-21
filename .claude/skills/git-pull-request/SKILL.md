@@ -53,6 +53,32 @@ git log origin/$(git branch --show-current)..HEAD --oneline 2>/dev/null
   ```
 - 원격에 push되지 않은 커밋이 있으면 → "먼저 push가 필요합니다. push 후 진행할까요?" 확인
 
+### Step 1.5: target 브랜치와 conflict 확인
+
+target 브랜치(기본 `main`)를 fetch한 후 conflict 여부를 확인한다:
+
+```bash
+git fetch origin [TARGET]
+git merge --no-commit --no-ff origin/[TARGET] 2>&1
+```
+
+- **conflict 없음** → `git merge --abort`로 되돌리고 Step 2 진행
+- **conflict 있음** → `git merge --abort`로 되돌리고, conflict 파일 목록을 보여준 뒤 안내:
+  ```
+  ⚠️ target 브랜치(origin/[TARGET])와 conflict가 있습니다.
+
+  충돌 파일:
+  - {파일 목록}
+
+  PR 생성 전에 conflict를 해결해야 합니다.
+  `git merge origin/[TARGET]`으로 병합 후 conflict를 해결하시겠습니까?
+  ```
+  사용자 승인 시:
+  1. `git merge origin/[TARGET]` 실행
+  2. conflict 파일을 읽고 해결
+  3. 머지 커밋 생성
+  4. push 후 Step 2 진행
+
 ### Step 2: target 브랜치 확인
 
 사용자에게 물어본다:

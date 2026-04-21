@@ -93,6 +93,22 @@ public class ObstacleSpawner : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 난이도 매니저에서 호출. 스폰 간격 범위를 갱신한다.
+    /// 현재 타이머가 새 최대값보다 크면 즉시 클램프.
+    /// </summary>
+    public void SetSpawnInterval(float min, float max)
+    {
+        spawnIntervalMin = min;
+        spawnIntervalMax = max;
+
+        // 현재 타이머가 새 최대값을 초과하면 클램프
+        if (_spawnTimer > spawnIntervalMax)
+        {
+            _spawnTimer = spawnIntervalMax;
+        }
+    }
+
     private void ResetTimer()
     {
         _spawnTimer = Random.Range(spawnIntervalMin, spawnIntervalMax);
