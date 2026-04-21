@@ -18,7 +18,7 @@ public class AirObstacleMover : MonoBehaviour
     [SerializeField] private float referenceSpeed = 6f;
 
     [Tooltip("Y 위치 하한선 (이 아래로 내려가지 않음 — Ground 영역 보호)")]
-    [SerializeField] private float minY = 1.0f;
+    [SerializeField] private float minY = 1.5f;
 
     [Tooltip("이동 시작 시 amplitude가 최대치에 도달하는 시간 (초)")]
     [SerializeField] private float rampUpDuration = 3f;
