@@ -13,6 +13,7 @@ public enum ObstacleType
 
 /// <summary>
 /// 장애물 컴포넌트. 왼쪽으로 이동하며, 화면 밖으로 나가면 오브젝트 풀로 반환.
+/// GroundScroller의 현재 속도와 동기화하여 지면과 같은 속도로 이동한다.
 /// Collider2D를 Trigger로 설정하고, Tag를 "Obstacle"로 지정할 것.
 /// </summary>
 public class Obstacle : MonoBehaviour, IPoolable
@@ -22,7 +23,7 @@ public class Obstacle : MonoBehaviour, IPoolable
     [Tooltip("이 값보다 X가 작아지면 풀로 반환 (화면 왼쪽 밖)")]
     [SerializeField] private float destroyX = -15f;
 
-    private float _scrollSpeed;
+    private GroundScroller _groundScroller;
     private ObstaclePool _pool;
 
     public ObstacleType ObstacleType => obstacleType;
@@ -32,8 +33,10 @@ public class Obstacle : MonoBehaviour, IPoolable
     /// </summary>
     public void Initialize(float scrollSpeed, ObstaclePool pool = null)
     {
-        _scrollSpeed = scrollSpeed;
         _pool = pool;
+        // GroundScroller 캐싱 (한 번만)
+        if (_groundScroller == null)
+            _groundScroller = Object.FindFirstObjectByType<GroundScroller>();
     }
 
     private void Update()
@@ -41,7 +44,9 @@ public class Obstacle : MonoBehaviour, IPoolable
         if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
             return;
 
-        transform.position += Vector3.left * _scrollSpeed * Time.deltaTime;
+        // GroundScroller의 현재 속도와 동기화
+        float speed = _groundScroller != null ? _groundScroller.ScrollSpeed : 8f;
+        transform.position += Vector3.left * speed * Time.deltaTime;
 
         if (transform.position.x < destroyX)
         {

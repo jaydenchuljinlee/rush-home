@@ -2160,6 +2160,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 127063146217753640, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 127063146217753640, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 127063146217753640, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
       propertyPath: m_LocalPosition.x
       value: 100
       objectReference: {fileID: 0}
@@ -2239,6 +2247,14 @@ PrefabInstance:
     - target: {fileID: 6244521721278972891, guid: da080d18c13d04a02867e99fe54e3f6d, type: 3}
       propertyPath: m_Name
       value: GroundObstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7494808347458196772, guid: da080d18c13d04a02867e99fe54e3f6d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7494808347458196772, guid: da080d18c13d04a02867e99fe54e3f6d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7494808347458196772, guid: da080d18c13d04a02867e99fe54e3f6d, type: 3}
       propertyPath: m_LocalPosition.x
