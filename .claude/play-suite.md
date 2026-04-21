@@ -113,6 +113,14 @@ Suite는 **2 Phase**로 나뉜다:
 
 ---
 
+## F-AIR: AirObstacle 좌우 이동
+- 오브젝트: ObstacleSpawner, AirObstacle (인스턴스)
+- 검증: 30초 이후 AirObstacle에 AirObstacleMover 컴포넌트가 부착되어 있으면 Y축 왕복 이동 활성화
+- 대기: 5초 (누적 ~35초, Normal 구간 진입 후)
+- 판정: AirObstacleMover 컴포넌트가 있는 오브젝트에서 IsMoving == true, 에러 로그 없음
+
+---
+
 ## F-13: 레벨 패턴 다양화
 - 오브젝트: DifficultyManager, ObstacleSpawner, PatternSpawner (선택), TerrainChunkSpawner (선택)
 - 검증: DifficultyManager가 씬에 존재하고, PatternSpawner/TerrainChunkSpawner 컴포넌트가 씬에 추가되면 난이도에 따라 패턴 풀 및 청크 타입이 변경됨

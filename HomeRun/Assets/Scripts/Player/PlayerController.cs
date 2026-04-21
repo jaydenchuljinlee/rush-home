@@ -13,10 +13,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.2f;
 
+    [Header("Fast Fall")]
+    [SerializeField] private float fallGravityMultiplier = 2.5f;
+
     [Header("Slide")]
     [SerializeField] private float slideDuration = 0.5f;
 
     private Rigidbody2D _rigidbody;
+    private float _baseGravityScale;
     private BoxCollider2D _collider;
     private Vector2 _normalColliderSize;
     private Vector2 _normalColliderOffset;
@@ -41,6 +45,7 @@ public class PlayerController : MonoBehaviour
 
         _normalColliderSize = _collider.size;
         _normalColliderOffset = _collider.offset;
+        _baseGravityScale = _rigidbody.gravityScale;
     }
 
     private void Update()
@@ -51,6 +56,7 @@ public class PlayerController : MonoBehaviour
         CheckGround();
         HandleInput();
         UpdateSlide();
+        ApplyFastFall();
     }
 
     private void CheckGround()
@@ -144,6 +150,18 @@ public class PlayerController : MonoBehaviour
         if (_slideTimer <= 0f)
         {
             EndSlide();
+        }
+    }
+
+    private void ApplyFastFall()
+    {
+        if (!_isGrounded && _rigidbody.linearVelocity.y < 0f)
+        {
+            _rigidbody.gravityScale = _baseGravityScale * fallGravityMultiplier;
+        }
+        else
+        {
+            _rigidbody.gravityScale = _baseGravityScale;
         }
     }
 
