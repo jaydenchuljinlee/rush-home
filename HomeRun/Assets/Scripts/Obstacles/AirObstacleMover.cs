@@ -1,47 +1,44 @@
 using UnityEngine;
 
 /// <summary>
-/// 공중 장애물(AirObstacle) 전용 Y축 왕복 이동 컴포넌트.
-/// Normal 난이도(30초) 이후부터 활성화되어 위아래로 왕복 이동한다.
+/// 공중 장애물(AirObstacle) 전용 X축 좌우 왕복 이동 컴포넌트.
+/// Normal 난이도(30초) 이후부터 활성화되어 좌우로 왕복 이동한다.
 /// 지면 스크롤 속도에 비례하여 이동 폭과 빈도가 증가한다.
+/// 기본 왼쪽 이동(Obstacle.cs)에 X 오프셋을 더하는 방식.
 /// </summary>
 public class AirObstacleMover : MonoBehaviour
 {
-    [Header("기본 이동 설정 (Easy 속도 기준)")]
-    [Tooltip("기준 속도(Easy)에서의 Y축 왕복 폭")]
-    [SerializeField] private float baseAmplitude = 1.2f;
+    [Header("좌우 이동 설정 (Easy 속도 기준)")]
+    [Tooltip("기준 속도(Easy)에서의 X축 왕복 폭")]
+    [SerializeField] private float baseAmplitude = 1.5f;
 
     [Tooltip("기준 속도(Easy)에서의 초당 왕복 횟수")]
-    [SerializeField] private float baseFrequency = 1.2f;
+    [SerializeField] private float baseFrequency = 1.0f;
 
     [Tooltip("비례 계산 기준이 되는 지면 속도 (Easy 속도)")]
     [SerializeField] private float referenceSpeed = 6f;
 
-    [Tooltip("Y 위치 하한선 (이 아래로 내려가지 않음 — Ground 영역 보호)")]
-    [SerializeField] private float minY = 1.5f;
-
     [Tooltip("이동 시작 시 amplitude가 최대치에 도달하는 시간 (초)")]
     [SerializeField] private float rampUpDuration = 3f;
 
-    private float _spawnY;
     private float _phase;
     private float _rampUpTimer;
+    private float _prevOffset;
     private bool _isMoving;
     private GroundScroller _groundScroller;
 
     public float Amplitude => GetScaledAmplitude();
     public float Frequency => GetScaledFrequency();
     public bool IsMoving => _isMoving;
-    public float SpawnY => _spawnY;
 
     private void OnEnable()
     {
         _phase = 0f;
+        _prevOffset = 0f;
     }
 
     private void Start()
     {
-        _spawnY = transform.position.y;
         _groundScroller = Object.FindFirstObjectByType<GroundScroller>();
         RefreshActiveState();
     }
@@ -64,10 +61,14 @@ public class AirObstacleMover : MonoBehaviour
         amp *= rampFactor;
 
         _phase += Time.deltaTime;
-        float yOffset = Mathf.Sin(_phase * freq * Mathf.PI * 2f) * amp;
+        float xOffset = Mathf.Sin(_phase * freq * Mathf.PI * 2f) * amp;
+
+        // 이전 프레임 오프셋을 빼고 새 오프셋을 더함 (delta 방식)
+        float delta = xOffset - _prevOffset;
+        _prevOffset = xOffset;
 
         Vector3 pos = transform.position;
-        pos.y = Mathf.Max(_spawnY + yOffset, minY);
+        pos.x += delta;
         transform.position = pos;
     }
 
@@ -100,9 +101,9 @@ public class AirObstacleMover : MonoBehaviour
 
         if (!_isMoving && shouldMove)
         {
-            _spawnY = transform.position.y;
             _phase = 0f;
             _rampUpTimer = 0f;
+            _prevOffset = 0f;
         }
 
         _isMoving = shouldMove;
@@ -115,8 +116,8 @@ public class AirObstacleMover : MonoBehaviour
         _isMoving = active;
         if (active)
         {
-            _spawnY = transform.position.y;
             _phase = 0f;
+            _prevOffset = 0f;
         }
     }
 
