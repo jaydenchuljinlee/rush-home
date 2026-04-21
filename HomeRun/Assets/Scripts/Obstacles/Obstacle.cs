@@ -47,9 +47,18 @@ public class Obstacle : MonoBehaviour, IPoolable
         if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
             return;
 
-        float baseSpeed = _groundScroller != null ? _groundScroller.ScrollSpeed : 8f;
-        float speed = obstacleType == ObstacleType.Air ? baseSpeed * airSpeedRatio : baseSpeed;
-        transform.position += Vector3.left * speed * Time.deltaTime;
+        if (obstacleType == ObstacleType.Ground)
+        {
+            // Ground: GroundScroller와 정확히 동일한 이동량 사용 (지면에 고정)
+            float moveAmount = _groundScroller != null ? _groundScroller.LastMoveAmount : 8f * Time.deltaTime;
+            transform.position += Vector3.left * moveAmount;
+        }
+        else
+        {
+            // Air: 지면 속도의 일정 비율로 독립 이동
+            float baseSpeed = _groundScroller != null ? _groundScroller.ScrollSpeed : 8f;
+            transform.position += Vector3.left * baseSpeed * airSpeedRatio * Time.deltaTime;
+        }
 
         if (transform.position.x < destroyX)
         {

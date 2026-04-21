@@ -10,12 +10,18 @@ public class GroundScroller : MonoBehaviour
     [SerializeField] private float tileWidth = 20f;
 
     private Transform[] _tiles;
+    private float _lastMoveAmount;
 
     public float ScrollSpeed
     {
         get => scrollSpeed;
         set => scrollSpeed = value;
     }
+
+    /// <summary>
+    /// 이번 프레임에 지면이 이동한 거리. Ground 장애물이 동기화에 사용.
+    /// </summary>
+    public float LastMoveAmount => _lastMoveAmount;
 
     private void Awake()
     {
@@ -29,9 +35,13 @@ public class GroundScroller : MonoBehaviour
     private void Update()
     {
         if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
+        {
+            _lastMoveAmount = 0f;
             return;
+        }
 
         float moveAmount = scrollSpeed * Time.deltaTime;
+        _lastMoveAmount = moveAmount;
 
         foreach (Transform tile in _tiles)
         {
