@@ -17,6 +17,8 @@ public class DifficultyManager : MonoBehaviour
     [SerializeField] private DifficultyData difficultyData;
     [SerializeField] private GroundScroller groundScroller;
     [SerializeField] private ObstacleSpawner obstacleSpawner;
+    [SerializeField] private PatternSpawner patternSpawner;
+    [SerializeField] private TerrainChunkSpawner terrainChunkSpawner;
 
     private void Awake()
     {
@@ -59,6 +61,21 @@ public class DifficultyManager : MonoBehaviour
         {
             obstacleSpawner.SetSpawnInterval(spawnMin, spawnMax);
         }
+
+        // 패턴 스포너: 현재 난이도에 맞는 패턴 풀 전달
+        if (patternSpawner != null)
+        {
+            patternSpawner.SetSpawnInterval(spawnMin, spawnMax);
+            LevelPatternData[] patterns = difficultyData.GetPatternsForTime(elapsed);
+            patternSpawner.SetAvailablePatterns(patterns);
+        }
+
+        // 지형 청크 스포너: 현재 티어 전달
+        if (terrainChunkSpawner != null)
+        {
+            DifficultyTier tier = difficultyData.GetTierForTime(elapsed);
+            terrainChunkSpawner.SetDifficultyTier(tier);
+        }
     }
 
     private void HandleGameStateChanged(GameState state)
@@ -77,6 +94,20 @@ public class DifficultyManager : MonoBehaviour
                     difficultyData.EasySpawnMin,
                     difficultyData.EasySpawnMax
                 );
+            }
+
+            if (patternSpawner != null)
+            {
+                patternSpawner.SetSpawnInterval(
+                    difficultyData.EasySpawnMin,
+                    difficultyData.EasySpawnMax
+                );
+                patternSpawner.SetAvailablePatterns(difficultyData.EasyPatterns);
+            }
+
+            if (terrainChunkSpawner != null)
+            {
+                terrainChunkSpawner.SetDifficultyTier(DifficultyTier.Easy);
             }
         }
     }
