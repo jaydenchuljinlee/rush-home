@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5932984001013964525}
   - component: {fileID: 2594261420794677408}
   - component: {fileID: 814718413818443174}
+  - component: {fileID: 2668010274888620960}
   m_Layer: 10
   m_Name: AirObstacle
   m_TagString: Obstacle
@@ -29,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 100, y: 2, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -153,3 +154,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: HomeRun.Runtime::Obstacle
   obstacleType: 1
   destroyX: -15
+  airSpeedRatio: 0.7
+--- !u!114 &2668010274888620960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9130572012494687464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe6f2553e5325478da2fa455b5dac426, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: HomeRun.Runtime::AirObstacleMover
+  baseAmplitude: 1.2
+  baseFrequency: 1.2
+  referenceSpeed: 6
+  minY: 1

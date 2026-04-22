@@ -88,4 +88,51 @@ public class DifficultyData : ScriptableObject
         if (elapsedTime >= normalThreshold) return (normalSpawnMin, normalSpawnMax);
         return (easySpawnMin, easySpawnMax);
     }
+
+    // ===== 난이도별 패턴 풀 =====
+
+    [Header("난이도별 허용 패턴 에셋")]
+    [Tooltip("Easy 구간에서 사용할 패턴 목록")]
+    [SerializeField] private LevelPatternData[] easyPatterns = new LevelPatternData[0];
+
+    [Tooltip("Normal 구간에서 사용할 패턴 목록")]
+    [SerializeField] private LevelPatternData[] normalPatterns = new LevelPatternData[0];
+
+    [Tooltip("Hard 구간에서 사용할 패턴 목록")]
+    [SerializeField] private LevelPatternData[] hardPatterns = new LevelPatternData[0];
+
+    [Tooltip("Extreme 구간에서 사용할 패턴 목록")]
+    [SerializeField] private LevelPatternData[] extremePatterns = new LevelPatternData[0];
+
+    public LevelPatternData[] EasyPatterns => easyPatterns;
+    public LevelPatternData[] NormalPatterns => normalPatterns;
+    public LevelPatternData[] HardPatterns => hardPatterns;
+    public LevelPatternData[] ExtremePatterns => extremePatterns;
+
+    /// <summary>
+    /// 경과 시간에 따른 현재 난이도 티어를 반환한다.
+    /// </summary>
+    public DifficultyTier GetTierForTime(float elapsedTime)
+    {
+        if (elapsedTime >= extremeThreshold) return DifficultyTier.Extreme;
+        if (elapsedTime >= hardThreshold) return DifficultyTier.Hard;
+        if (elapsedTime >= normalThreshold) return DifficultyTier.Normal;
+        return DifficultyTier.Easy;
+    }
+
+    /// <summary>
+    /// 경과 시간에 해당하는 난이도 구간의 패턴 배열을 반환한다.
+    /// 배열이 비어있으면 null 대신 빈 배열을 반환한다.
+    /// </summary>
+    public LevelPatternData[] GetPatternsForTime(float elapsedTime)
+    {
+        DifficultyTier tier = GetTierForTime(elapsedTime);
+        return tier switch
+        {
+            DifficultyTier.Extreme => extremePatterns,
+            DifficultyTier.Hard    => hardPatterns,
+            DifficultyTier.Normal  => normalPatterns,
+            _                      => easyPatterns,
+        };
+    }
 }

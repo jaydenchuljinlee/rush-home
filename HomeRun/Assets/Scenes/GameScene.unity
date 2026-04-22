@@ -587,6 +587,8 @@ MonoBehaviour:
   difficultyData: {fileID: 11400000, guid: 6155564766d1543eb848c590921e0032, type: 2}
   groundScroller: {fileID: 1169615632}
   obstacleSpawner: {fileID: 1879098095}
+  patternSpawner: {fileID: 1100074412}
+  terrainChunkSpawner: {fileID: 0}
 --- !u!1 &665158164
 GameObject:
   m_ObjectHideFlags: 0
@@ -725,6 +727,29 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &743873361 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9130572012494687464, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+  m_PrefabInstance: {fileID: 739286060613843443}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &743873366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743873361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe6f2553e5325478da2fa455b5dac426, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: HomeRun.Runtime::AirObstacleMover
+  baseAmplitude: 1.2
+  baseFrequency: 1.2
+  referenceSpeed: 6
+  maxAmplitude: 2
+  maxFrequency: 2
+  rampUpDuration: 3
 --- !u!1 &756928074
 GameObject:
   m_ObjectHideFlags: 0
@@ -1439,6 +1464,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1100074411
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1100074413}
+  - component: {fileID: 1100074412}
+  m_Layer: 0
+  m_Name: PatternSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1100074412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1100074411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 769d256a6f61c40e2987d619e316223d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: HomeRun.Runtime::PatternSpawner
+  groundScroller: {fileID: 1169615632}
+  obstaclePool: {fileID: 1662735159}
+  spawnIntervalMin: 1.5
+  spawnIntervalMax: 3
+  spawnX: 12
+  groundObstacleY: 0
+  airObstacleY: 1.5
+--- !u!4 &1100074413
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1100074411}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1169615631
 GameObject:
   m_ObjectHideFlags: 0
@@ -1924,8 +2000,8 @@ MonoBehaviour:
   - {fileID: 9130572012494687464, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
   groundScroller: {fileID: 1169615632}
   obstaclePool: {fileID: 1662735159}
-  spawnIntervalMin: 1.5
-  spawnIntervalMax: 3
+  slotSpacingMin: 5
+  slotSpacingMax: 10
   spawnX: 12
   groundObstacleY: 0
   airObstacleY: 1.5
@@ -2158,6 +2234,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 127063146217753640, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 127063146217753640, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 127063146217753640, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
       propertyPath: m_LocalPosition.x
       value: 100
       objectReference: {fileID: 0}
@@ -2224,7 +2308,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9130572012494687464, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 743873366}
   m_SourcePrefab: {fileID: 100100000, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
 --- !u!1001 &4224352758209758076
 PrefabInstance:
@@ -2237,6 +2324,14 @@ PrefabInstance:
     - target: {fileID: 6244521721278972891, guid: da080d18c13d04a02867e99fe54e3f6d, type: 3}
       propertyPath: m_Name
       value: GroundObstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7494808347458196772, guid: da080d18c13d04a02867e99fe54e3f6d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7494808347458196772, guid: da080d18c13d04a02867e99fe54e3f6d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7494808347458196772, guid: da080d18c13d04a02867e99fe54e3f6d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2332,6 +2427,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3291217024253382315, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
+      propertyPath: jumpForce
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3291217024253382315, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
       propertyPath: groundLayer.m_Bits
       value: 256
       objectReference: {fileID: 0}
@@ -2372,3 +2471,4 @@ SceneRoots:
   - {fileID: 1209120673}
   - {fileID: 1891917531}
   - {fileID: 952971026}
+  - {fileID: 1100074413}
