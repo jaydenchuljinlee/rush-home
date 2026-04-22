@@ -22,6 +22,14 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField] private float slotSpacingMax = 10f;
     [SerializeField] private float spawnX = 12f;
 
+    [Header("점프 클리어런스")]
+    [Tooltip("플레이어 점프 체공 시간 (초). jumpForce=9, gravityScale=3 기준 약 0.61초")]
+    [SerializeField] private float jumpDuration = 0.61f;
+    [Tooltip("장애물 폭 (스케일 반영). 0.7 기준")]
+    [SerializeField] private float obstacleWidth = 0.7f;
+    [Tooltip("점프 클리어런스 여유 비율 (1.0 = 여유 없음, 1.3 = 30% 여유)")]
+    [SerializeField] private float clearanceMargin = 1.3f;
+
     [Header("Y 위치 설정")]
     [Tooltip("바닥 장애물 스폰 Y (지면 상단 = 0)")]
     [SerializeField] private float groundObstacleY = 0f;
@@ -103,14 +111,18 @@ public class ObstacleSpawner : MonoBehaviour
 
     /// <summary>
     /// 난이도 매니저에서 호출. 시간 간격(초)을 거리 간격으로 변환하여 적용.
+    /// 최소 간격은 플레이어 점프 클리어런스 이상으로 보장한다.
     /// </summary>
     public void SetSpawnInterval(float minTime, float maxTime)
     {
         float speed = groundScroller != null ? groundScroller.ScrollSpeed : 8f;
-        slotSpacingMin = minTime * speed;
-        slotSpacingMax = maxTime * speed;
 
-        // 현재 남은 거리가 새 최대값을 초과하면 클램프
+        // 점프 클리어런스: 점프 중 이동 거리 + 장애물 폭 + 여유
+        float minJumpClearance = (jumpDuration * speed + obstacleWidth) * clearanceMargin;
+
+        slotSpacingMin = Mathf.Max(minTime * speed, minJumpClearance);
+        slotSpacingMax = Mathf.Max(maxTime * speed, minJumpClearance + 2f);
+
         if (_nextSlotDistance > slotSpacingMax)
         {
             _nextSlotDistance = slotSpacingMax;
