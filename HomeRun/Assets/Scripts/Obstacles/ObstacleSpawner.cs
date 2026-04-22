@@ -29,10 +29,10 @@ public class ObstacleSpawner : MonoBehaviour
     [Header("점프 클리어런스")]
     [Tooltip("장애물 폭 (스케일 반영). 0.7 기준")]
     [SerializeField] private float obstacleWidth = 0.7f;
-    [Tooltip("점프 클리어런스 여유 비율 (1.0 = 여유 없음, 1.3 = 30% 여유)")]
-    [SerializeField] private float clearanceMargin = 1.3f;
+    [Tooltip("점프 클리어런스 여유 비율 (1.0 = 여유 없음, 1.8 = 80% 여유)")]
+    [SerializeField] private float clearanceMargin = 1.8f;
     [Tooltip("Ground↔Air 타입 전환 시 추가 여유 배율 (점프 착지+자세전환 시간)")]
-    [SerializeField] private float typeTransitionMultiplier = 1.5f;
+    [SerializeField] private float typeTransitionMultiplier = 2.0f;
 
     [Header("Y 위치 설정")]
     [Tooltip("바닥 장애물 스폰 Y (지면 상단 = 0)")]
