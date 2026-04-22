@@ -18,7 +18,7 @@ MonoBehaviour:
   extremeSpeed: 15
   normalThreshold: 30
   hardThreshold: 60
-  extremeThreshold: 90
+  extremeThreshold: 120
   easySpawnMin: 1.5
   easySpawnMax: 3
   normalSpawnMin: 1.2
