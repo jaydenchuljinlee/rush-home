@@ -32,7 +32,17 @@ public class GameUIController : MonoBehaviour
 
     private void Start()
     {
-        if (readyPanel != null) readyPanel.SetActive(true);
+        // 현재 GameState에 맞게 UI 초기화 (Start 실행 순서에 의존하지 않음)
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Playing)
+        {
+            if (readyPanel != null) readyPanel.SetActive(false);
+            if (timeText != null) timeText.gameObject.SetActive(true);
+        }
+        else
+        {
+            if (readyPanel != null) readyPanel.SetActive(true);
+        }
+
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
 
         if (restartButton != null)
