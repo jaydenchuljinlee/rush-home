@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded => _isGrounded;
     public bool IsSliding => _isSliding;
+    public float JumpForce => jumpForce;
 
     public static event System.Action OnPlayerHit;
 

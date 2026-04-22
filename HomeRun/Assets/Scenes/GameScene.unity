@@ -2000,9 +2000,14 @@ MonoBehaviour:
   - {fileID: 9130572012494687464, guid: a8070eddf73024bbcbe02a4b89206054, type: 3}
   groundScroller: {fileID: 1169615632}
   obstaclePool: {fileID: 1662735159}
+  playerRigidbody: {fileID: 8163681249689098812}
+  playerController: {fileID: 8163681249689098811}
   slotSpacingMin: 5
   slotSpacingMax: 10
   spawnX: 12
+  obstacleWidth: 0.7
+  clearanceMargin: 1.3
+  typeTransitionMultiplier: 1.5
   groundObstacleY: 0
   airObstacleY: 1.5
 --- !u!4 &1879098096
@@ -2455,6 +2460,22 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
+--- !u!114 &8163681249689098811 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3291217024253382315, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
+  m_PrefabInstance: {fileID: 8163681249689098810}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17277b2b5307c4ee091444c0ff4e0c08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: HomeRun.Runtime::PlayerController
+--- !u!50 &8163681249689098812 stripped
+Rigidbody2D:
+  m_CorrespondingSourceObject: {fileID: 6903960667496100888, guid: 0df4d192c69f9411a92be76f468eadf3, type: 3}
+  m_PrefabInstance: {fileID: 8163681249689098810}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

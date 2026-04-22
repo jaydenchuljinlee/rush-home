@@ -14,6 +14,10 @@ public class ObstacleSpawner : MonoBehaviour
     [Header("참조")]
     [SerializeField] private GroundScroller groundScroller;
     [SerializeField] private ObstaclePool obstaclePool;
+    [Tooltip("플레이어 Rigidbody2D (점프 물리값 자동 계산용)")]
+    [SerializeField] private Rigidbody2D playerRigidbody;
+    [Tooltip("플레이어 PlayerController (jumpForce 참조용)")]
+    [SerializeField] private PlayerController playerController;
 
     [Header("슬롯 설정")]
     [Tooltip("슬롯 간 최소 X 거리 (지면 스크롤 기준)")]
@@ -23,8 +27,6 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField] private float spawnX = 12f;
 
     [Header("점프 클리어런스")]
-    [Tooltip("플레이어 점프 체공 시간 (초). jumpForce=9, gravityScale=3 기준 약 0.61초")]
-    [SerializeField] private float jumpDuration = 0.61f;
     [Tooltip("장애물 폭 (스케일 반영). 0.7 기준")]
     [SerializeField] private float obstacleWidth = 0.7f;
     [Tooltip("점프 클리어런스 여유 비율 (1.0 = 여유 없음, 1.3 = 30% 여유)")]
@@ -44,10 +46,33 @@ public class ObstacleSpawner : MonoBehaviour
     private float _nextSlotDistance;
     /// <summary>마지막 스폰된 장애물 타입 (타입 전환 감지용)</summary>
     private ObstacleType _lastSpawnedType;
+    /// <summary>플레이어 물리값 기반 점프 체공 시간 (초)</summary>
+    private float _jumpDuration;
 
     private void Start()
     {
+        CalculateJumpDuration();
         ResetSlotDistance();
+    }
+
+    /// <summary>
+    /// 플레이어의 jumpForce와 gravityScale에서 점프 체공 시간을 계산한다.
+    /// jumpDuration = 2 × jumpForce / (gravity × gravityScale)
+    /// </summary>
+    private void CalculateJumpDuration()
+    {
+        float jumpForce = 9f;     // 폴백 기본값
+        float gravityScale = 3f;  // 폴백 기본값
+
+        if (playerController != null)
+            jumpForce = playerController.JumpForce;
+        if (playerRigidbody != null)
+            gravityScale = playerRigidbody.gravityScale;
+
+        float gravity = Mathf.Abs(Physics2D.gravity.y);
+        _jumpDuration = (gravity * gravityScale > 0f)
+            ? 2f * jumpForce / (gravity * gravityScale)
+            : 0.61f; // 안전 폴백
     }
 
     private void OnEnable()
@@ -93,7 +118,7 @@ public class ObstacleSpawner : MonoBehaviour
         if (currentType != _lastSpawnedType)
         {
             float speed = groundScroller != null ? groundScroller.ScrollSpeed : 8f;
-            float minTransitionGap = (jumpDuration * speed + obstacleWidth) * clearanceMargin * typeTransitionMultiplier;
+            float minTransitionGap = (_jumpDuration * speed + obstacleWidth) * clearanceMargin * typeTransitionMultiplier;
 
             if (_distanceSinceLastSpawn < minTransitionGap)
             {
@@ -151,7 +176,7 @@ public class ObstacleSpawner : MonoBehaviour
         float speed = groundScroller != null ? groundScroller.ScrollSpeed : 8f;
 
         // 점프 클리어런스: 점프 중 이동 거리 + 장애물 폭 + 여유
-        float minJumpClearance = (jumpDuration * speed + obstacleWidth) * clearanceMargin;
+        float minJumpClearance = (_jumpDuration * speed + obstacleWidth) * clearanceMargin;
 
         slotSpacingMin = Mathf.Max(minTime * speed, minJumpClearance);
         slotSpacingMax = Mathf.Max(maxTime * speed, minJumpClearance + 2f);
