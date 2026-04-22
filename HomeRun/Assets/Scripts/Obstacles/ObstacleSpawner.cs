@@ -29,6 +29,8 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField] private float obstacleWidth = 0.7f;
     [Tooltip("점프 클리어런스 여유 비율 (1.0 = 여유 없음, 1.3 = 30% 여유)")]
     [SerializeField] private float clearanceMargin = 1.3f;
+    [Tooltip("Ground↔Air 타입 전환 시 추가 여유 배율 (점프 착지+자세전환 시간)")]
+    [SerializeField] private float typeTransitionMultiplier = 1.5f;
 
     [Header("Y 위치 설정")]
     [Tooltip("바닥 장애물 스폰 Y (지면 상단 = 0)")]
@@ -40,6 +42,8 @@ public class ObstacleSpawner : MonoBehaviour
     private float _distanceSinceLastSpawn;
     /// <summary>다음 스폰까지 필요한 거리</summary>
     private float _nextSlotDistance;
+    /// <summary>마지막 스폰된 장애물 타입 (타입 전환 감지용)</summary>
+    private ObstacleType _lastSpawnedType;
 
     private void Start()
     {
@@ -81,8 +85,37 @@ public class ObstacleSpawner : MonoBehaviour
         GameObject prefab = obstaclePrefabs[index];
         if (prefab == null) return;
 
-        // 장애물 타입에 따라 Y 결정
+        // 장애물 타입 확인
         Obstacle prefabObstacle = prefab.GetComponent<Obstacle>();
+        ObstacleType currentType = prefabObstacle != null ? prefabObstacle.ObstacleType : ObstacleType.Ground;
+
+        // 타입 전환 감지: Ground↔Air 전환 시 추가 간격이 부족하면 스폰 지연
+        if (currentType != _lastSpawnedType)
+        {
+            float speed = groundScroller != null ? groundScroller.ScrollSpeed : 8f;
+            float minTransitionGap = (jumpDuration * speed + obstacleWidth) * clearanceMargin * typeTransitionMultiplier;
+
+            if (_distanceSinceLastSpawn < minTransitionGap)
+            {
+                // 간격 부족 → 이번 슬롯에서는 같은 타입으로 변경
+                currentType = _lastSpawnedType;
+                // 같은 타입의 프리팹 찾기
+                for (int i = 0; i < obstaclePrefabs.Length; i++)
+                {
+                    var obs = obstaclePrefabs[i] != null ? obstaclePrefabs[i].GetComponent<Obstacle>() : null;
+                    if (obs != null && obs.ObstacleType == currentType)
+                    {
+                        prefab = obstaclePrefabs[i];
+                        prefabObstacle = obs;
+                        break;
+                    }
+                }
+            }
+        }
+
+        _lastSpawnedType = currentType;
+
+        // 장애물 타입에 따라 Y 결정
         float spawnY = groundObstacleY;
         if (prefabObstacle != null && prefabObstacle.ObstacleType == ObstacleType.Air)
         {
