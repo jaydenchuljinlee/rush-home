@@ -122,10 +122,29 @@ Suite는 **2 Phase**로 나뉜다:
 ---
 
 ## F-13: 레벨 패턴 다양화
-- 오브젝트: DifficultyManager, ObstacleSpawner, PatternSpawner (선택), TerrainChunkSpawner (선택)
-- 검증: DifficultyManager가 씬에 존재하고, PatternSpawner/TerrainChunkSpawner 컴포넌트가 씬에 추가되면 난이도에 따라 패턴 풀 및 청크 타입이 변경됨
+- 오브젝트: DifficultyManager, ObstacleSpawner
+- 검증: DifficultyManager가 씬에 존재하고 ObstacleSpawner가 단독으로 스폰
 - 대기: 3초
-- 판정: DifficultyManager 오브젝트 존재 + 컴파일 에러 없음 + 게임 시작 후 에러 로그 없음. Inspector에서 PatternSpawner/TerrainChunkSpawner를 DifficultyManager에 연결하면 패턴 스폰 활성화됨.
+- 판정: DifficultyManager 오브젝트 존재 + 컴파일 에러 없음 + 에러 로그 없음
+
+---
+
+## 구조 무결성 검증 (매 suite 실행 시)
+
+### 스포너 중복 검사
+- 검증: 장애물을 스폰하는 활성 컴포넌트가 **1개만** 존재하는지 확인
+- 방법: `list_game_objects_in_hierarchy`로 ObstacleSpawner(enabled) + PatternSpawner(enabled) 카운트
+- 판정: 활성 스포너 1개 이하
+
+### 템플릿 오브젝트 위치 검증
+- 검증: 풀 원본 오브젝트(GroundObstacle, AirObstacle 등 Clone이 아닌 것)가 **초기 위치(X≈100)에 고정**
+- 방법: play 10초 후 `get_game_object_info`로 템플릿 X 좌표 확인
+- 판정: 템플릿 X >= 90 (화면 밖 유지)
+
+### 장애물 간격 검증
+- 검증: 활성 클론 간 **최소 간격이 점프 클리어런스 이상**
+- 방법: 활성 장애물 X 좌표를 수집하여 인접 간격 계산
+- 판정: 인접 간격 >= jumpClearance (동적 계산값)
 
 ---
 

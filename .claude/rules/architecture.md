@@ -64,6 +64,17 @@ Assets/
 | Manager (싱글톤) | Scripts/Managers/ | 전역 시스템 관리 |
 | Pure C# | Scripts/Utils/ | Unity 비의존 유틸리티/헬퍼 |
 
+## 시스템 중복 방지
+
+- **같은 역할의 시스템은 씬에 1개만 활성화**한다
+  - 예: ObstacleSpawner와 PatternSpawner가 동시에 장애물을 스폰하면 간격 계산이 무너짐
+  - 새 스포너를 추가할 때는 기존 스포너를 **확장하거나 대체**, 공존시키지 않는다
+- **프리팹 에셋과 씬 오브젝트는 항상 동기화**한다
+  - `set_property`로 씬 오브젝트를 변경할 때 `Assets/Prefabs/`의 프리팹 에셋도 같이 변경
+  - `add_component`도 씬 + 프리팹 양쪽에 적용 (`prefab_path` 파라미터 사용)
+- **SerializeField 값 변경은 코드 + Inspector 동시 반영**
+  - 코드 기본값만 변경하면 씬의 직렬화 값이 우선됨 → `set_property` 또는 `SerializedObject`로 반영
+
 ## 의존성 규칙
 
 **허용**:
