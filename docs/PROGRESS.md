@@ -105,7 +105,7 @@
 
 | # | Feature | 선행 | 상태 | 완료 기준 |
 |---|---------|------|------|----------|
-| F-15 | 코드 구조 리팩토링 | F-13 | 대기 | 미사용 코드 제거 + GameManager null 체크 집중화 + GroundScroller tileWidth 수정 + 스포너 통합 검토 |
+| F-15 | 코드 구조 리팩토링 | F-13 | 완료 | 미사용 코드 제거 + GameManager null 체크 집중화 + GroundScroller tileWidth 수정 + 스포너 통합 검토 |
 
 ### 폴리싱
 
