@@ -1,3 +1,9 @@
+---
+feature: F-05
+status: fixed
+created: 2026-04-21
+---
+
 # Bug Report: F-05 ReadyPanel 미숨김 + GameOverPanel 하위 오브젝트 누락
 
 ## 발견일

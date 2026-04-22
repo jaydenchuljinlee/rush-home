@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded => _isGrounded;
     public bool IsSliding => _isSliding;
+    public float JumpForce => jumpForce;
 
     public static event System.Action OnPlayerHit;
 
@@ -45,8 +46,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
-            return;
+        if (!GameManager.IsPlaying) return;
 
         CheckGround();
         HandleInput();

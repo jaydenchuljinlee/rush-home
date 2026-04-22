@@ -7,7 +7,7 @@ using UnityEngine;
 public class GroundScroller : MonoBehaviour
 {
     [SerializeField] private float scrollSpeed = 8f;
-    [SerializeField] private float tileWidth = 20f;
+    [SerializeField] private float tileWidth = 16f;
 
     private Transform[] _tiles;
     private float _lastMoveAmount;
@@ -34,7 +34,7 @@ public class GroundScroller : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
+        if (!GameManager.IsPlaying)
         {
             _lastMoveAmount = 0f;
             return;

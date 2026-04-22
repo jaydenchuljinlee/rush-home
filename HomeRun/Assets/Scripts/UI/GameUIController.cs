@@ -51,9 +51,9 @@ public class GameUIController : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance == null) return;
+        if (GameManager.Instance == null) return; // IsPlaying 외 CurrentState도 참조하므로 null 가드 유지
 
-        if (GameManager.Instance.CurrentState == GameState.Playing && timeText != null)
+        if (GameManager.IsPlaying && timeText != null)
         {
             timeText.text = FormatTime(GameManager.Instance.ElapsedTime);
         }
@@ -72,7 +72,7 @@ public class GameUIController : MonoBehaviour
             case GameState.GameOver:
                 if (gameOverPanel != null) gameOverPanel.SetActive(true);
                 if (timeText != null) timeText.gameObject.SetActive(false);
-                if (finalTimeText != null)
+                if (finalTimeText != null && GameManager.Instance != null)
                     finalTimeText.text = FormatTime(GameManager.Instance.ElapsedTime);
                 break;
         }

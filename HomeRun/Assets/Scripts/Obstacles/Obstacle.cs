@@ -46,8 +46,7 @@ public class Obstacle : MonoBehaviour, IPoolable
         // 템플릿 오브젝트(Initialize 미호출)는 이동하지 않음
         if (!_initialized) return;
 
-        if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
-            return;
+        if (!GameManager.IsPlaying) return;
 
         float moveAmount = _groundScroller != null ? _groundScroller.LastMoveAmount : 8f * Time.deltaTime;
         transform.position += Vector3.left * moveAmount;

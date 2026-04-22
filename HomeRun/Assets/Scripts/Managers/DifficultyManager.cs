@@ -42,8 +42,7 @@ public class DifficultyManager : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance == null) return;
-        if (GameManager.Instance.CurrentState != GameState.Playing) return;
+        if (!GameManager.IsPlaying) return;
         if (difficultyData == null) return;
 
         float elapsed = GameManager.Instance.ElapsedTime;

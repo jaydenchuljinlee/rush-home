@@ -20,6 +20,12 @@ public class GameManager : MonoBehaviour
     public GameState CurrentState { get; private set; } = GameState.Ready;
     public float ElapsedTime { get; private set; }
 
+    /// <summary>
+    /// 게임이 Playing 상태인지 확인하는 편의 프로퍼티.
+    /// Instance null 체크를 포함하므로 각 컴포넌트에서 별도 null 체크 불필요.
+    /// </summary>
+    public static bool IsPlaying => Instance != null && Instance.CurrentState == GameState.Playing;
+
     public static event System.Action<GameState> OnGameStateChanged;
 
     private void Awake()

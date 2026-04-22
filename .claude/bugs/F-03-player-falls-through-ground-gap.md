@@ -1,6 +1,6 @@
 ---
 feature: F-03
-status: open
+status: fixed
 severity: major
 created: 2026-04-21
 ---
