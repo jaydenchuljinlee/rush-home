@@ -50,8 +50,7 @@ public class ObstacleSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
-            return;
+        if (!GameManager.IsPlaying) return;
 
         // 지면이 이동한 거리를 누적
         float moveAmount = groundScroller != null ? groundScroller.LastMoveAmount : 8f * Time.deltaTime;

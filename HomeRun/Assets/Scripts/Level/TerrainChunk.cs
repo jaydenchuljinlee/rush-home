@@ -79,8 +79,7 @@ public class TerrainChunk : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
-            return;
+        if (!GameManager.IsPlaying) return;
 
         transform.position += Vector3.left * _scrollSpeed * Time.deltaTime;
 

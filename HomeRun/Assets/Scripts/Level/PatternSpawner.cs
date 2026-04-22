@@ -42,8 +42,7 @@ public class PatternSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Playing)
-            return;
+        if (!GameManager.IsPlaying) return;
 
         _spawnTimer -= Time.deltaTime;
         if (_spawnTimer <= 0f)

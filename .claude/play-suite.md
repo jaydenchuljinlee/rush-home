@@ -126,3 +126,11 @@ Suite는 **2 Phase**로 나뉜다:
 - 검증: DifficultyManager가 씬에 존재하고, PatternSpawner/TerrainChunkSpawner 컴포넌트가 씬에 추가되면 난이도에 따라 패턴 풀 및 청크 타입이 변경됨
 - 대기: 3초
 - 판정: DifficultyManager 오브젝트 존재 + 컴파일 에러 없음 + 게임 시작 후 에러 로그 없음. Inspector에서 PatternSpawner/TerrainChunkSpawner를 DifficultyManager에 연결하면 패턴 스폰 활성화됨.
+
+---
+
+## F-15: 코드 구조 리팩토링
+- 오브젝트: GroundScroller, GameManager
+- 검증: 게임 시작 시 에러 없이 동작, GroundScroller tileWidth=16 적용 상태에서 지면 타일이 정상 순환
+- 대기: 3초
+- 판정: 에러 로그 0건 + GroundScroller 하위 타일 X 위치가 순환(화면 밖 → 오른쪽 재배치)
