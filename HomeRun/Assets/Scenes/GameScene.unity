@@ -175,6 +175,7 @@ MonoBehaviour:
   tileHeight: 2
   bottomExtend: 8
   slopeHeightDelta: 0.8
+  gapWidth: 4
   curveSegments: 8
   curveMagnitudeRatio: 0.3
 --- !u!60 &33724415
@@ -629,6 +630,7 @@ MonoBehaviour:
   tileHeight: 2
   bottomExtend: 8
   slopeHeightDelta: 0.8
+  gapWidth: 4
   curveSegments: 8
   curveMagnitudeRatio: 0.3
 --- !u!23 &278025759
@@ -831,8 +833,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95d405ff3ecbd4e319f57400efbb6a9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: HomeRun.Runtime::TerrainTypeSequencer
-  hardGapChance: 0
-  extremeGapChance: 0
+  hardGapChance: 0.15
+  extremeGapChance: 0.25
 --- !u!4 &375770157
 Transform:
   m_ObjectHideFlags: 0
@@ -904,6 +906,7 @@ MonoBehaviour:
   tileHeight: 2
   bottomExtend: 8
   slopeHeightDelta: 0.8
+  gapWidth: 4
   curveSegments: 8
   curveMagnitudeRatio: 0.3
 --- !u!23 &665158169
@@ -1625,6 +1628,7 @@ MonoBehaviour:
   tileHeight: 2
   bottomExtend: 8
   slopeHeightDelta: 0.8
+  gapWidth: 4
   curveSegments: 8
   curveMagnitudeRatio: 0.3
 --- !u!23 &929809194
@@ -1835,6 +1839,7 @@ MonoBehaviour:
   tileHeight: 2
   bottomExtend: 8
   slopeHeightDelta: 0.8
+  gapWidth: 4
   curveSegments: 8
   curveMagnitudeRatio: 0.3
 --- !u!60 &1070314737

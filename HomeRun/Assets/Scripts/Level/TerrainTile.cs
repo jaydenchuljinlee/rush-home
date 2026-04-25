@@ -15,6 +15,8 @@ public class TerrainTile : MonoBehaviour
     [Tooltip("메시 하단 확장 깊이. 카메라 뷰 아래를 완전히 덮기 위해 충분히 깊게 설정.")]
     [SerializeField] private float bottomExtend = 8f;
     [SerializeField] private float slopeHeightDelta = 0.8f;
+    [Tooltip("Gap 타일의 빈 구간 폭 (유닛). 플레이어가 점프로 넘을 수 있는 크기.")]
+    [SerializeField] private float gapWidth = 4f;
     [SerializeField] private int curveSegments = 8;
     [SerializeField] private float curveMagnitudeRatio = 0.3f;
 
@@ -30,7 +32,8 @@ public class TerrainTile : MonoBehaviour
     public float RightTopYOffset => _rightTopYOffset;
     public float SlopeHeightDelta => slopeHeightDelta;
     public int CurveSegments => curveSegments;
-    public bool HasGround => _currentType != TerrainChunkType.Gap;
+    /// <summary>Gap도 양쪽에 지면이 있으므로 항상 true. 메시/콜라이더는 Gap 형상으로 그린다.</summary>
+    public bool HasGround => true;
 
     private void Awake()
     {
@@ -173,23 +176,14 @@ public class TerrainTile : MonoBehaviour
 
     private void ApplyGeometry()
     {
-        bool visible = HasGround;
-        if (meshRenderer != null)
-        {
-            meshRenderer.enabled = visible;
-        }
+        if (meshRenderer != null) meshRenderer.enabled = true;
+        if (polygonCollider != null) polygonCollider.enabled = true;
 
-        if (polygonCollider != null)
+        if (_currentType == TerrainChunkType.Gap)
         {
-            polygonCollider.enabled = visible;
+            ApplyGapGeometry();
         }
-
-        if (!visible)
-        {
-            return;
-        }
-
-        if (_currentType == TerrainChunkType.CurveUp || _currentType == TerrainChunkType.CurveDown)
+        else if (_currentType == TerrainChunkType.CurveUp || _currentType == TerrainChunkType.CurveDown)
         {
             ApplyCurveGeometry();
         }
@@ -237,6 +231,67 @@ public class TerrainTile : MonoBehaviour
             new Vector2(-halfWidth - colliderOverlap, leftTopY),
             new Vector2(halfWidth + colliderOverlap, rightTopY),
             new Vector2(halfWidth + colliderOverlap, bottomY)
+        });
+    }
+
+    /// <summary>
+    /// Gap: 양쪽에 지면, 가운데에 gapWidth만큼 빈 구간.
+    /// 메시는 왼쪽 블록 + 오른쪽 블록으로 분리, 콜라이더도 2개 경로.
+    /// </summary>
+    private void ApplyGapGeometry()
+    {
+        float halfWidth = tileWidth * 0.5f;
+        float halfHeight = tileHeight * 0.5f;
+        float bottomY = -halfHeight - bottomExtend;
+        float baseTopY = halfHeight;
+        float topY = baseTopY + _leftTopYOffset; // Gap은 Flat 높이 유지
+        float halfGap = gapWidth * 0.5f;
+
+        // 왼쪽 블록: [-halfWidth, -halfGap], 오른쪽 블록: [halfGap, halfWidth]
+        Vector3[] vertices =
+        {
+            // 왼쪽 블록 (0-3)
+            new Vector3(-halfWidth, bottomY, 0f),
+            new Vector3(-halfWidth, topY, 0f),
+            new Vector3(-halfGap, topY, 0f),
+            new Vector3(-halfGap, bottomY, 0f),
+            // 오른쪽 블록 (4-7)
+            new Vector3(halfGap, bottomY, 0f),
+            new Vector3(halfGap, topY, 0f),
+            new Vector3(halfWidth, topY, 0f),
+            new Vector3(halfWidth, bottomY, 0f),
+        };
+
+        _mesh.Clear();
+        _mesh.vertices = vertices;
+        _mesh.uv = new[]
+        {
+            new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0.4f, 1f), new Vector2(0.4f, 0f),
+            new Vector2(0.6f, 0f), new Vector2(0.6f, 1f), new Vector2(1f, 1f), new Vector2(1f, 0f),
+        };
+        _mesh.triangles = new[]
+        {
+            0, 1, 2, 0, 2, 3, // 왼쪽
+            4, 5, 6, 4, 6, 7, // 오른쪽
+        };
+        _mesh.RecalculateBounds();
+
+        // 콜라이더: 왼쪽 + 오른쪽 2개 경로
+        float colliderOverlap = 0.2f;
+        polygonCollider.pathCount = 2;
+        polygonCollider.SetPath(0, new[]
+        {
+            new Vector2(-halfWidth - colliderOverlap, bottomY),
+            new Vector2(-halfWidth - colliderOverlap, topY),
+            new Vector2(-halfGap, topY),
+            new Vector2(-halfGap, bottomY),
+        });
+        polygonCollider.SetPath(1, new[]
+        {
+            new Vector2(halfGap, bottomY),
+            new Vector2(halfGap, topY),
+            new Vector2(halfWidth + colliderOverlap, topY),
+            new Vector2(halfWidth + colliderOverlap, bottomY),
         });
     }
 
