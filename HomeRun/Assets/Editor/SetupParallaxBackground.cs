@@ -104,7 +104,8 @@ public class SetupParallaxBackground
                 SpriteRenderer sr = tile.AddComponent<SpriteRenderer>();
                 sr.sprite = GetWhiteSprite();
                 sr.color = cfg.color;
-                sr.sortingOrder = -(i + 1) * 10;  // Sky=-10, Far=-20, Near=-30 (뒤에서 앞 순)
+                sr.sortingLayerName = "Background";
+                sr.sortingOrder = i;  // Sky=0, Far=1, Near=2 (Background 레이어 내에서 뒤→앞)
             }
 
             layerComponents[i] = pl;
