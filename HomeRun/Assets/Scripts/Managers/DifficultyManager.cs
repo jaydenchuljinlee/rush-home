@@ -19,6 +19,7 @@ public class DifficultyManager : MonoBehaviour
     [SerializeField] private ObstacleSpawner obstacleSpawner;
     [SerializeField] private PatternSpawner patternSpawner;
     [SerializeField] private TerrainChunkSpawner terrainChunkSpawner;
+    [SerializeField] private TerrainTypeSequencer terrainTypeSequencer;
 
     private void Awake()
     {
@@ -75,6 +76,12 @@ public class DifficultyManager : MonoBehaviour
             DifficultyTier tier = difficultyData.GetTierForTime(elapsed);
             terrainChunkSpawner.SetDifficultyTier(tier);
         }
+
+        if (terrainTypeSequencer != null)
+        {
+            DifficultyTier tier = difficultyData.GetTierForTime(elapsed);
+            terrainTypeSequencer.SetDifficultyTier(tier);
+        }
     }
 
     private void HandleGameStateChanged(GameState state)
@@ -107,6 +114,11 @@ public class DifficultyManager : MonoBehaviour
             if (terrainChunkSpawner != null)
             {
                 terrainChunkSpawner.SetDifficultyTier(DifficultyTier.Easy);
+            }
+
+            if (terrainTypeSequencer != null)
+            {
+                terrainTypeSequencer.SetDifficultyTier(DifficultyTier.Easy);
             }
         }
     }
