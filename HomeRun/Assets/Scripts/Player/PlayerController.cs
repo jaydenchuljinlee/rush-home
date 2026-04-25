@@ -18,8 +18,10 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D _rigidbody;
     private BoxCollider2D _collider;
+    private SpriteRenderer _spriteRenderer;
     private Vector2 _normalColliderSize;
     private Vector2 _normalColliderOffset;
+    private Vector3 _normalScale;
     private bool _isGrounded;
     private bool _isSliding;
     private float _slideTimer;
@@ -35,13 +37,20 @@ public class PlayerController : MonoBehaviour
 
     public static event System.Action OnPlayerHit;
 
+#if UNITY_EDITOR
+    /// <summary>디버그 무적 모드. true면 OnPlayerHit을 발동하지 않는다.</summary>
+    public static bool DebugInvincible { get; set; } = true;
+#endif
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
         _collider = GetComponent<BoxCollider2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
 
         _normalColliderSize = _collider.size;
         _normalColliderOffset = _collider.offset;
+        _normalScale = transform.localScale;
     }
 
     private void Update()
@@ -51,6 +60,7 @@ public class PlayerController : MonoBehaviour
         CheckGround();
         HandleInput();
         UpdateSlide();
+        CheckFallDeath();
     }
 
     private void CheckGround()
@@ -60,7 +70,16 @@ public class PlayerController : MonoBehaviour
             _isGrounded = false;
             return;
         }
-        _isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        // BoxCast로 콜라이더 너비 전체를 아래 방향으로 감지 — 경사면 PolygonCollider2D도 안정적으로 감지
+        float castWidth = _collider != null ? _collider.size.x * 0.8f : 0.5f;
+        _isGrounded = Physics2D.BoxCast(
+            groundCheck.position,
+            new Vector2(castWidth, 0.05f),
+            0f,
+            Vector2.down,
+            groundCheckRadius,
+            groundLayer
+        );
     }
 
     private void HandleInput()
@@ -80,7 +99,7 @@ public class PlayerController : MonoBehaviour
             TryJump();
         }
 
-        if (Keyboard.current.downArrowKey.wasPressedThisFrame)
+        if (Keyboard.current.downArrowKey.wasPressedThisFrame || Keyboard.current.sKey.wasPressedThisFrame)
         {
             TrySlide();
         }
@@ -134,6 +153,9 @@ public class PlayerController : MonoBehaviour
         // 콜라이더를 절반 높이로 줄임
         _collider.size = new Vector2(_normalColliderSize.x, _normalColliderSize.y * 0.5f);
         _collider.offset = new Vector2(_normalColliderOffset.x, _normalColliderOffset.y - _normalColliderSize.y * 0.25f);
+
+        // 스프라이트 Y 스케일 0.5로 줄여 시각 피드백 제공
+        transform.localScale = new Vector3(_normalScale.x, _normalScale.y * 0.5f, _normalScale.z);
     }
 
     private void UpdateSlide()
@@ -152,12 +174,43 @@ public class PlayerController : MonoBehaviour
         _isSliding = false;
         _collider.size = _normalColliderSize;
         _collider.offset = _normalColliderOffset;
+
+        // 스프라이트 스케일 복구
+        transform.localScale = _normalScale;
+    }
+
+    private void CheckFallDeath()
+    {
+        if (transform.position.y < -2f && _rigidbody.linearVelocity.y < -1f)
+        {
+            // 떨어지기 시작할 때 바로 기록
+            var gs = FindAnyObjectByType<GroundScroller>();
+            if (gs != null)
+            {
+                for (int i = 0; i < gs.transform.childCount; i++)
+                {
+                    var child = gs.transform.GetChild(i);
+                    var tt = child.GetComponent<TerrainTile>();
+                    if (tt != null)
+                    {
+                        float dist = Mathf.Abs(child.position.x - transform.position.x);
+                        if (dist < 20f)
+                            Debug.LogError($"[FALL] Tile '{child.name}' X={child.position.x:F1} type={tt.CurrentType} L={tt.LeftTopYOffset:F2} R={tt.RightTopYOffset:F2} hasGround={tt.HasGround}");
+                    }
+                }
+                Debug.LogError($"[FALL] Player X={transform.position.x:F1} Y={transform.position.y:F1} velY={_rigidbody.linearVelocity.y:F1}");
+            }
+            OnPlayerHit?.Invoke();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Obstacle"))
         {
+#if UNITY_EDITOR
+            if (DebugInvincible) return;
+#endif
             OnPlayerHit?.Invoke();
         }
     }
@@ -166,6 +219,12 @@ public class PlayerController : MonoBehaviour
     {
         if (groundCheck == null) return;
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        // BoxCast 범위 시각화
+        BoxCollider2D col = GetComponent<BoxCollider2D>();
+        float castWidth = col != null ? col.size.x * 0.8f : 0.5f;
+        Gizmos.DrawWireCube(
+            groundCheck.position + Vector3.down * groundCheckRadius * 0.5f,
+            new Vector3(castWidth, groundCheckRadius, 0f)
+        );
     }
 }

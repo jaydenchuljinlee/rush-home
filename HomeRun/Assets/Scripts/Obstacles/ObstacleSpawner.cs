@@ -146,6 +146,10 @@ public class ObstacleSpawner : MonoBehaviour
         {
             spawnY = airObstacleY;
         }
+        else if (groundScroller != null)
+        {
+            spawnY = groundScroller.GetGroundY(spawnX) + groundObstacleY;
+        }
 
         Vector3 spawnPos = new Vector3(spawnX, spawnY, 0f);
 

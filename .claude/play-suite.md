@@ -153,3 +153,11 @@ Suite는 **2 Phase**로 나뉜다:
 - 검증: 게임 시작 시 에러 없이 동작, GroundScroller tileWidth=16 적용 상태에서 지면 타일이 정상 순환
 - 대기: 3초
 - 판정: 에러 로그 0건 + GroundScroller 하위 타일 X 위치가 순환(화면 밖 → 오른쪽 재배치)
+
+---
+
+## F-14: 지형 변화 (경사/곡선/틈새)
+- 오브젝트: GroundScroller, GroundTile_0, GroundTile_1, GroundTile_2, TerrainTypeSequencer
+- 검증: TerrainTypeSequencer를 Normal 이상 티어로 설정 시 CurveUp/CurveDown/SlopeUp/SlopeDown/Gap 타입이 타일에 적용되며, 인접 타일 접합부 높이가 연속됨
+- 대기: 3초
+- 판정: ForceTerrainCurve 스크립트로 강제 적용 시 각 TerrainTile의 vertexCount == 18 (CurveUp/CurveDown), 접합부 RightTopYOffset == 다음 타일 LeftTopYOffset (오차 0.001 이내), 에러 로그 없음

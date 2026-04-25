@@ -26,6 +26,8 @@ public class Obstacle : MonoBehaviour, IPoolable
     private GroundScroller _groundScroller;
     private ObstaclePool _pool;
     private bool _initialized;
+    /// <summary>스폰 시 지면 Y 기준 오프셋. Ground 장애물이 경사를 따라가는 데 사용.</summary>
+    private float _groundYOffset;
 
     public ObstacleType ObstacleType => obstacleType;
 
@@ -39,6 +41,13 @@ public class Obstacle : MonoBehaviour, IPoolable
         _pool = pool;
         if (_groundScroller == null)
             _groundScroller = Object.FindFirstObjectByType<GroundScroller>();
+
+        // Ground 장애물: 스폰 위치 기준 지면 Y 오프셋을 기록하여 이동 중 경사를 추적
+        if (obstacleType == ObstacleType.Ground && _groundScroller != null)
+        {
+            float groundY = _groundScroller.GetGroundY(transform.position.x);
+            _groundYOffset = transform.position.y - groundY;
+        }
     }
 
     private void Update()
@@ -49,7 +58,17 @@ public class Obstacle : MonoBehaviour, IPoolable
         if (!GameManager.IsPlaying) return;
 
         float moveAmount = _groundScroller != null ? _groundScroller.LastMoveAmount : 8f * Time.deltaTime;
-        transform.position += Vector3.left * moveAmount;
+        Vector3 pos = transform.position;
+        pos.x -= moveAmount;
+
+        // Ground 장애물은 매 프레임 경사 높이에 맞게 Y를 업데이트
+        if (obstacleType == ObstacleType.Ground && _groundScroller != null)
+        {
+            float groundY = _groundScroller.GetGroundY(pos.x);
+            pos.y = groundY + _groundYOffset;
+        }
+
+        transform.position = pos;
 
         if (transform.position.x < destroyX)
         {
