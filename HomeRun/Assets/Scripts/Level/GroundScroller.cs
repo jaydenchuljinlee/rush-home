@@ -10,7 +10,7 @@ public class GroundScroller : MonoBehaviour
     [SerializeField] private float tileWidth = 16f;
     [SerializeField] private Camera viewCamera;
     [SerializeField] private float recycleScreenMargin = 1f;
-    [SerializeField] private float minTerrainYOffset = -1.6f;
+    [SerializeField] private float minTerrainYOffset = 0f;
     [SerializeField] private float maxTerrainYOffset = 1.6f;
     [SerializeField] private TerrainTypeSequencer terrainSequencer;
 

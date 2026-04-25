@@ -461,6 +461,8 @@ MonoBehaviour:
   tileWidth: 16
   tileHeight: 2
   slopeHeightDelta: 0.8
+  curveSegments: 8
+  curveMagnitudeRatio: 0.3
 --- !u!23 &278025759
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -733,6 +735,8 @@ MonoBehaviour:
   tileWidth: 16
   tileHeight: 2
   slopeHeightDelta: 0.8
+  curveSegments: 8
+  curveMagnitudeRatio: 0.3
 --- !u!23 &665158169
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1451,6 +1455,8 @@ MonoBehaviour:
   tileWidth: 16
   tileHeight: 2
   slopeHeightDelta: 0.8
+  curveSegments: 8
+  curveMagnitudeRatio: 0.3
 --- !u!23 &929809194
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1687,7 +1693,7 @@ MonoBehaviour:
   tileWidth: 16
   viewCamera: {fileID: 100000003}
   recycleScreenMargin: 1
-  minTerrainYOffset: -1.6
+  minTerrainYOffset: 0
   maxTerrainYOffset: 1.6
   terrainSequencer: {fileID: 375770156}
 --- !u!4 &1169615633
