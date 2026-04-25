@@ -102,6 +102,28 @@ public class GroundScroller : MonoBehaviour
 
     public float GetGroundY(float worldX)
     {
+        float halfWidth = tileWidth * 0.5f;
+
+        // 1순위: worldX가 타일 X 범위 안에 포함된 타일을 우선 선택
+        for (int i = 0; i < _tiles.Length; i++)
+        {
+            Transform tile = _tiles[i];
+            TerrainTile terrainTile = _terrainTiles[i];
+            if (terrainTile == null || !terrainTile.HasGround)
+            {
+                continue;
+            }
+
+            float tileLeft = tile.position.x - halfWidth;
+            float tileRight = tile.position.x + halfWidth;
+            if (worldX >= tileLeft && worldX <= tileRight)
+            {
+                float localX = terrainTile.transform.InverseTransformPoint(new Vector3(worldX, 0f, 0f)).x;
+                return terrainTile.transform.position.y + terrainTile.GetGroundYAtLocalX(localX);
+            }
+        }
+
+        // 2순위: 범위 내 타일이 없으면 가장 가까운 타일로 폴백
         TerrainTile nearestGroundTile = null;
         float nearestGroundDistance = float.MaxValue;
         Transform nearestTile = null;
