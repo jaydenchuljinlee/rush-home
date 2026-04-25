@@ -22,9 +22,29 @@ public class DebugCheatManager : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
-        {
+        if (Keyboard.current == null) return;
+
+        if (Keyboard.current.f1Key.wasPressedThisFrame)
             ToggleInvincible();
+
+        // 난이도 전환은 OnGUI 버튼으로 처리
+    }
+
+    private void SetDifficultyTier(DifficultyTier tier)
+    {
+        // Ready 상태면 게임 시작
+        if (GameManager.Instance != null && !GameManager.IsPlaying)
+            GameManager.Instance.StartGame();
+
+        // DifficultyManager의 디버그 오버라이드로 매 프레임 덮어쓰기 방지
+        if (DifficultyManager.Instance != null)
+        {
+            DifficultyManager.Instance.SetDebugTierOverride(tier);
+            Debug.Log($"[DEBUG] Difficulty Override → {tier}");
+        }
+        else
+        {
+            Debug.LogWarning("[DebugCheatManager] DifficultyManager not found");
         }
     }
 
@@ -86,16 +106,30 @@ public class DebugCheatManager : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!_isInvincible) return;
+        var btnStyle = new GUIStyle(GUI.skin.button) { fontSize = 14 };
+        float y = 40f;
 
-        var style = new GUIStyle(GUI.skin.label)
+        if (_isInvincible)
         {
-            fontSize = 18,
-            fontStyle = FontStyle.Bold
-        };
-        style.normal.textColor = Color.red;
+            var labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 18, fontStyle = FontStyle.Bold };
+            labelStyle.normal.textColor = Color.red;
+            GUI.Label(new Rect(10, 10, 300, 30), "[DEBUG] INVINCIBLE: ON", labelStyle);
+        }
 
-        GUI.Label(new Rect(10, 10, 300, 30), "[DEBUG] INVINCIBLE: ON", style);
+        // 난이도 전환 버튼 (우측 상단)
+        float btnW = 80f, btnH = 30f, margin = 5f;
+        float rightX = Screen.width - btnW - 10f;
+
+        if (GUI.Button(new Rect(rightX, y, btnW, btnH), "Normal", btnStyle))
+            SetDifficultyTier(DifficultyTier.Normal);
+        y += btnH + margin;
+
+        if (GUI.Button(new Rect(rightX, y, btnW, btnH), "Hard", btnStyle))
+            SetDifficultyTier(DifficultyTier.Hard);
+        y += btnH + margin;
+
+        if (GUI.Button(new Rect(rightX, y, btnW, btnH), "Extreme", btnStyle))
+            SetDifficultyTier(DifficultyTier.Extreme);
     }
 }
 #endif

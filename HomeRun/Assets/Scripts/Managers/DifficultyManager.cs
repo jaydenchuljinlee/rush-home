@@ -14,6 +14,23 @@ public class DifficultyManager : MonoBehaviour
 {
     public static DifficultyManager Instance { get; private set; }
 
+#if UNITY_EDITOR
+    private bool _debugOverride;
+    private DifficultyTier _debugTier;
+
+    /// <summary>디버그용: 경과 시간 무시하고 지정 티어를 강제 적용한다.</summary>
+    public void SetDebugTierOverride(DifficultyTier tier)
+    {
+        _debugOverride = true;
+        _debugTier = tier;
+    }
+
+    public void ClearDebugTierOverride()
+    {
+        _debugOverride = false;
+    }
+#endif
+
     [SerializeField] private DifficultyData difficultyData;
     [SerializeField] private GroundScroller groundScroller;
     [SerializeField] private ObstacleSpawner obstacleSpawner;
@@ -47,6 +64,18 @@ public class DifficultyManager : MonoBehaviour
         if (difficultyData == null) return;
 
         float elapsed = GameManager.Instance.ElapsedTime;
+
+#if UNITY_EDITOR
+        if (_debugOverride)
+            elapsed = _debugTier switch
+            {
+                DifficultyTier.Easy => 0f,
+                DifficultyTier.Normal => 31f,
+                DifficultyTier.Hard => 61f,
+                DifficultyTier.Extreme => 121f,
+                _ => elapsed
+            };
+#endif
 
         // 스크롤 속도 적용
         float targetSpeed = difficultyData.GetSpeedForTime(elapsed);
