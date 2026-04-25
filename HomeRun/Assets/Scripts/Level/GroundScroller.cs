@@ -174,6 +174,8 @@ public class GroundScroller : MonoBehaviour
         {
             TerrainChunkType.SlopeUp => leftTopYOffset + slopeHeightDelta,
             TerrainChunkType.SlopeDown => leftTopYOffset - slopeHeightDelta,
+            TerrainChunkType.CurveUp => leftTopYOffset + slopeHeightDelta,
+            TerrainChunkType.CurveDown => leftTopYOffset - slopeHeightDelta,
             _ => leftTopYOffset
         };
 

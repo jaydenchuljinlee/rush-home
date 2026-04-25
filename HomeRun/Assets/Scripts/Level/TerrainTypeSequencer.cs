@@ -56,10 +56,40 @@ public class TerrainTypeSequencer : MonoBehaviour
         switch (_lastType)
         {
             case TerrainChunkType.SlopeUp:
-                return Random.value < 0.5f ? TerrainChunkType.SlopeUp : TerrainChunkType.Flat;
+            {
+                // SlopeUp 다음: SlopeUp 50%, Flat 25%, CurveUp 25%
+                float roll = Random.value;
+                if (roll < 0.5f) return TerrainChunkType.SlopeUp;
+                if (roll < 0.75f) return TerrainChunkType.Flat;
+                return TerrainChunkType.CurveUp;
+            }
 
             case TerrainChunkType.SlopeDown:
-                return Random.value < 0.5f ? TerrainChunkType.SlopeDown : TerrainChunkType.Flat;
+            {
+                // SlopeDown 다음: SlopeDown 50%, Flat 25%, CurveDown 25%
+                float roll = Random.value;
+                if (roll < 0.5f) return TerrainChunkType.SlopeDown;
+                if (roll < 0.75f) return TerrainChunkType.Flat;
+                return TerrainChunkType.CurveDown;
+            }
+
+            case TerrainChunkType.CurveUp:
+            {
+                // CurveUp 다음: CurveUp 50%, Flat 25%, SlopeUp 25%
+                float roll = Random.value;
+                if (roll < 0.5f) return TerrainChunkType.CurveUp;
+                if (roll < 0.75f) return TerrainChunkType.Flat;
+                return TerrainChunkType.SlopeUp;
+            }
+
+            case TerrainChunkType.CurveDown:
+            {
+                // CurveDown 다음: CurveDown 50%, Flat 25%, SlopeDown 25%
+                float roll = Random.value;
+                if (roll < 0.5f) return TerrainChunkType.CurveDown;
+                if (roll < 0.75f) return TerrainChunkType.Flat;
+                return TerrainChunkType.SlopeDown;
+            }
 
             case TerrainChunkType.Gap:
                 return TerrainChunkType.Flat;
@@ -81,11 +111,14 @@ public class TerrainTypeSequencer : MonoBehaviour
 
     private static TerrainChunkType PickFlatStartNonGapType()
     {
-        int roll = Random.Range(0, 3);
+        // Flat, SlopeUp, SlopeDown, CurveUp, CurveDown 균등 선택
+        int roll = Random.Range(0, 5);
         return roll switch
         {
             1 => TerrainChunkType.SlopeUp,
             2 => TerrainChunkType.SlopeDown,
+            3 => TerrainChunkType.CurveUp,
+            4 => TerrainChunkType.CurveDown,
             _ => TerrainChunkType.Flat
         };
     }

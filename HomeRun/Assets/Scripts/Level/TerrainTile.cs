@@ -13,6 +13,8 @@ public class TerrainTile : MonoBehaviour
     [SerializeField] private float tileWidth = 16f;
     [SerializeField] private float tileHeight = 2f;
     [SerializeField] private float slopeHeightDelta = 0.8f;
+    [SerializeField] private int curveSegments = 8;
+    [SerializeField] private float curveMagnitudeRatio = 0.3f;
 
     private TerrainChunkType _currentType = TerrainChunkType.Flat;
     private Mesh _mesh;
@@ -25,6 +27,7 @@ public class TerrainTile : MonoBehaviour
     public float LeftTopYOffset => _leftTopYOffset;
     public float RightTopYOffset => _rightTopYOffset;
     public float SlopeHeightDelta => slopeHeightDelta;
+    public int CurveSegments => curveSegments;
     public bool HasGround => _currentType != TerrainChunkType.Gap;
 
     private void Awake()
@@ -63,7 +66,19 @@ public class TerrainTile : MonoBehaviour
 
         float halfWidth = tileWidth * 0.5f;
         float t = Mathf.InverseLerp(-halfWidth, halfWidth, localX);
-        return Mathf.Lerp(_leftTopYOffset, _rightTopYOffset, t);
+        float linearY = Mathf.Lerp(_leftTopYOffset, _rightTopYOffset, t);
+
+        if (_currentType == TerrainChunkType.CurveUp)
+        {
+            return linearY + Mathf.Sin(t * Mathf.PI) * slopeHeightDelta * curveMagnitudeRatio;
+        }
+
+        if (_currentType == TerrainChunkType.CurveDown)
+        {
+            return linearY - Mathf.Sin(t * Mathf.PI) * slopeHeightDelta * curveMagnitudeRatio;
+        }
+
+        return linearY;
     }
 
     private void InitializeIfNeeded()
@@ -142,9 +157,11 @@ public class TerrainTile : MonoBehaviour
         switch (type)
         {
             case TerrainChunkType.SlopeUp:
+            case TerrainChunkType.CurveUp:
                 return leftTopYOffset + slopeHeightDelta;
 
             case TerrainChunkType.SlopeDown:
+            case TerrainChunkType.CurveDown:
                 return leftTopYOffset - slopeHeightDelta;
 
             default:
@@ -165,6 +182,23 @@ public class TerrainTile : MonoBehaviour
             polygonCollider.enabled = visible;
         }
 
+        if (!visible)
+        {
+            return;
+        }
+
+        if (_currentType == TerrainChunkType.CurveUp || _currentType == TerrainChunkType.CurveDown)
+        {
+            ApplyCurveGeometry();
+        }
+        else
+        {
+            ApplyLinearGeometry();
+        }
+    }
+
+    private void ApplyLinearGeometry()
+    {
         float halfWidth = tileWidth * 0.5f;
         float halfHeight = tileHeight * 0.5f;
         float bottomY = -halfHeight;
@@ -200,5 +234,83 @@ public class TerrainTile : MonoBehaviour
             new Vector2(halfWidth, rightTopY),
             new Vector2(halfWidth, bottomY)
         });
+    }
+
+    private void ApplyCurveGeometry()
+    {
+        int n = Mathf.Max(2, curveSegments);
+        float halfWidth = tileWidth * 0.5f;
+        float halfHeight = tileHeight * 0.5f;
+        float bottomY = -halfHeight;
+        float baseTopY = halfHeight;
+        float leftTopY = baseTopY + _leftTopYOffset;
+        float rightTopY = baseTopY + _rightTopYOffset;
+        float curveBump = slopeHeightDelta * curveMagnitudeRatio;
+        bool isUp = _currentType == TerrainChunkType.CurveUp;
+
+        // 꼭짓점: 상단 (n+1)개 + 하단 (n+1)개
+        int totalVerts = 2 * (n + 1);
+        Vector3[] vertices = new Vector3[totalVerts];
+        Vector2[] uvs = new Vector2[totalVerts];
+        Vector2[] colliderTop = new Vector2[n + 1];
+        Vector2[] colliderBottom = new Vector2[n + 1];
+
+        for (int i = 0; i <= n; i++)
+        {
+            float t = i / (float)n;
+            float x = Mathf.Lerp(-halfWidth, halfWidth, t);
+            float linearTop = Mathf.Lerp(leftTopY, rightTopY, t);
+            float curveOffset = isUp
+                ? Mathf.Sin(t * Mathf.PI) * curveBump
+                : -Mathf.Sin(t * Mathf.PI) * curveBump;
+            float topY = linearTop + curveOffset;
+
+            // 상단 꼭짓점: 인덱스 i
+            vertices[i] = new Vector3(x, topY, 0f);
+            uvs[i] = new Vector2(t, 1f);
+            colliderTop[i] = new Vector2(x, topY);
+
+            // 하단 꼭짓점: 인덱스 (n+1) + i
+            vertices[n + 1 + i] = new Vector3(x, bottomY, 0f);
+            uvs[n + 1 + i] = new Vector2(t, 0f);
+            colliderBottom[i] = new Vector2(x, bottomY);
+        }
+
+        // 삼각형: 각 세그먼트마다 2개 (상단i, 상단i+1, 하단i), (상단i+1, 하단i+1, 하단i)
+        int[] triangles = new int[n * 6];
+        for (int i = 0; i < n; i++)
+        {
+            int topLeft = i;
+            int topRight = i + 1;
+            int botLeft = n + 1 + i;
+            int botRight = n + 1 + i + 1;
+
+            triangles[i * 6 + 0] = topLeft;
+            triangles[i * 6 + 1] = botLeft;
+            triangles[i * 6 + 2] = topRight;
+            triangles[i * 6 + 3] = topRight;
+            triangles[i * 6 + 4] = botLeft;
+            triangles[i * 6 + 5] = botRight;
+        }
+
+        _mesh.Clear();
+        _mesh.vertices = vertices;
+        _mesh.uv = uvs;
+        _mesh.triangles = triangles;
+        _mesh.RecalculateBounds();
+
+        // PolygonCollider2D: 상단 경로(좌→우) + 하단 역순(우→좌)
+        Vector2[] colliderPath = new Vector2[2 * (n + 1)];
+        for (int i = 0; i <= n; i++)
+        {
+            colliderPath[i] = colliderTop[i];
+        }
+        for (int i = 0; i <= n; i++)
+        {
+            colliderPath[n + 1 + i] = colliderBottom[n - i];
+        }
+
+        polygonCollider.pathCount = 1;
+        polygonCollider.SetPath(0, colliderPath);
     }
 }

@@ -3,8 +3,10 @@ using UnityEngine;
 /// <summary>
 /// 지형 청크 타입.
 /// Flat: 평지 (기본)
-/// SlopeUp: 오르막 경사
-/// SlopeDown: 내리막 경사
+/// SlopeUp: 오르막 직선 경사
+/// SlopeDown: 내리막 직선 경사
+/// CurveUp: 오르막 곡선 (중간 볼록)
+/// CurveDown: 내리막 곡선 (중간 오목)
 /// Gap: 틈새 (점프 필요)
 /// </summary>
 public enum TerrainChunkType
@@ -12,6 +14,8 @@ public enum TerrainChunkType
     Flat,
     SlopeUp,
     SlopeDown,
+    CurveUp,
+    CurveDown,
     Gap
 }
 
