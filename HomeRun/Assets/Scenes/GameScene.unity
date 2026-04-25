@@ -1687,6 +1687,8 @@ MonoBehaviour:
   tileWidth: 16
   viewCamera: {fileID: 100000003}
   recycleScreenMargin: 1
+  minTerrainYOffset: -1.6
+  maxTerrainYOffset: 1.6
   terrainSequencer: {fileID: 375770156}
 --- !u!4 &1169615633
 Transform:
