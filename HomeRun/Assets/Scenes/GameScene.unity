@@ -4423,7 +4423,7 @@ MonoBehaviour:
   clearanceMargin: 1.3
   typeTransitionMultiplier: 1.5
   groundObstacleY: 0
-  airObstacleY: 1.5
+  airObstacleY: 0.8
 --- !u!4 &1879098096
 Transform:
   m_ObjectHideFlags: 0

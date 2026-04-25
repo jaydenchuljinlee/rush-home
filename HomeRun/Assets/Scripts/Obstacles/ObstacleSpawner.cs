@@ -37,8 +37,8 @@ public class ObstacleSpawner : MonoBehaviour
     [Header("Y 위치 설정")]
     [Tooltip("바닥 장애물 스폰 Y (지면 상단 = 0)")]
     [SerializeField] private float groundObstacleY = 0f;
-    [Tooltip("공중 장애물 스폰 Y (플레이어 머리 위)")]
-    [SerializeField] private float airObstacleY = 1.5f;
+    [Tooltip("공중 장애물 스폰 Y (플레이어 머리 높이 기준)")]
+    [SerializeField] private float airObstacleY = 0.8f;
 
     /// <summary>마지막 스폰 이후 누적 이동 거리</summary>
     private float _distanceSinceLastSpawn;
