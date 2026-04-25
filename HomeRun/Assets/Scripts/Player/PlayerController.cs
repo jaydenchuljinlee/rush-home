@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
 
 #if UNITY_EDITOR
     /// <summary>디버그 무적 모드. true면 OnPlayerHit을 발동하지 않는다.</summary>
-    public static bool DebugInvincible { get; set; } = true;
+    public static bool DebugInvincible { get; set; } = false;
 #endif
 
     private void Awake()
