@@ -62,6 +62,10 @@ public class TerrainTile : MonoBehaviour
         ApplyGeometry();
     }
 
+    /// <summary>
+    /// 로컬 X 위치에서의 지면 상단 Y (ローカル座標).
+    /// baseTopY(tileHeight/2) + offset を返す。tile.position.y を足すとワールドY になる。
+    /// </summary>
     public float GetGroundYAtLocalX(float localX)
     {
         if (!HasGround)
@@ -70,20 +74,22 @@ public class TerrainTile : MonoBehaviour
         }
 
         float halfWidth = tileWidth * 0.5f;
+        float halfHeight = tileHeight * 0.5f;
         float t = Mathf.InverseLerp(-halfWidth, halfWidth, localX);
         float linearY = Mathf.Lerp(_leftTopYOffset, _rightTopYOffset, t);
+        float baseTopY = halfHeight;
 
         if (_currentType == TerrainChunkType.CurveUp)
         {
-            return linearY + Mathf.Sin(t * Mathf.PI) * slopeHeightDelta * curveMagnitudeRatio;
+            return baseTopY + linearY + Mathf.Sin(t * Mathf.PI) * slopeHeightDelta * curveMagnitudeRatio;
         }
 
         if (_currentType == TerrainChunkType.CurveDown)
         {
-            return linearY - Mathf.Sin(t * Mathf.PI) * slopeHeightDelta * curveMagnitudeRatio;
+            return baseTopY + linearY - Mathf.Sin(t * Mathf.PI) * slopeHeightDelta * curveMagnitudeRatio;
         }
 
-        return linearY;
+        return baseTopY + linearY;
     }
 
     private void InitializeIfNeeded()
