@@ -173,6 +173,7 @@ MonoBehaviour:
   terrainColor: {r: 0.58, g: 0.58, b: 0.58, a: 1}
   tileWidth: 16
   tileHeight: 2
+  bottomExtend: 8
   slopeHeightDelta: 0.8
   curveSegments: 8
   curveMagnitudeRatio: 0.3
@@ -626,6 +627,7 @@ MonoBehaviour:
   terrainColor: {r: 0.58, g: 0.58, b: 0.58, a: 1}
   tileWidth: 16
   tileHeight: 2
+  bottomExtend: 8
   slopeHeightDelta: 0.8
   curveSegments: 8
   curveMagnitudeRatio: 0.3
@@ -900,6 +902,7 @@ MonoBehaviour:
   terrainColor: {r: 0.58, g: 0.58, b: 0.58, a: 1}
   tileWidth: 16
   tileHeight: 2
+  bottomExtend: 8
   slopeHeightDelta: 0.8
   curveSegments: 8
   curveMagnitudeRatio: 0.3
@@ -1620,6 +1623,7 @@ MonoBehaviour:
   terrainColor: {r: 0.58, g: 0.58, b: 0.58, a: 1}
   tileWidth: 16
   tileHeight: 2
+  bottomExtend: 8
   slopeHeightDelta: 0.8
   curveSegments: 8
   curveMagnitudeRatio: 0.3
@@ -1829,6 +1833,7 @@ MonoBehaviour:
   terrainColor: {r: 0.58, g: 0.58, b: 0.58, a: 1}
   tileWidth: 16
   tileHeight: 2
+  bottomExtend: 8
   slopeHeightDelta: 0.8
   curveSegments: 8
   curveMagnitudeRatio: 0.3
@@ -2024,7 +2029,7 @@ MonoBehaviour:
   scrollSpeed: 8
   tileWidth: 16
   viewCamera: {fileID: 100000003}
-  recycleScreenMargin: 2
+  recycleScreenMargin: 0.5
   minTerrainYOffset: 0
   maxTerrainYOffset: 1.6
   terrainSequencer: {fileID: 375770156}

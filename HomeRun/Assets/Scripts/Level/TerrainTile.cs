@@ -12,6 +12,8 @@ public class TerrainTile : MonoBehaviour
     [SerializeField] private Color terrainColor = new Color(0.58f, 0.58f, 0.58f, 1f);
     [SerializeField] private float tileWidth = 16f;
     [SerializeField] private float tileHeight = 2f;
+    [Tooltip("메시 하단 확장 깊이. 카메라 뷰 아래를 완전히 덮기 위해 충분히 깊게 설정.")]
+    [SerializeField] private float bottomExtend = 8f;
     [SerializeField] private float slopeHeightDelta = 0.8f;
     [SerializeField] private int curveSegments = 8;
     [SerializeField] private float curveMagnitudeRatio = 0.3f;
@@ -201,7 +203,7 @@ public class TerrainTile : MonoBehaviour
     {
         float halfWidth = tileWidth * 0.5f;
         float halfHeight = tileHeight * 0.5f;
-        float bottomY = -halfHeight;
+        float bottomY = -halfHeight - bottomExtend;
         float baseTopY = halfHeight;
         float leftTopY = baseTopY + _leftTopYOffset;
         float rightTopY = baseTopY + _rightTopYOffset;
@@ -241,7 +243,7 @@ public class TerrainTile : MonoBehaviour
         int n = Mathf.Max(2, curveSegments);
         float halfWidth = tileWidth * 0.5f;
         float halfHeight = tileHeight * 0.5f;
-        float bottomY = -halfHeight;
+        float bottomY = -halfHeight - bottomExtend;
         float baseTopY = halfHeight;
         float leftTopY = baseTopY + _leftTopYOffset;
         float rightTopY = baseTopY + _rightTopYOffset;
