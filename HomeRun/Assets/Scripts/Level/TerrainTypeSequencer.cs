@@ -11,6 +11,7 @@ public class TerrainTypeSequencer : MonoBehaviour
 
     private DifficultyTier _currentTier = DifficultyTier.Easy;
     private TerrainChunkType _lastType = TerrainChunkType.Flat;
+    private bool _prevWasGap = false;
 
     public DifficultyTier CurrentTier => _currentTier;
 
@@ -42,12 +43,14 @@ public class TerrainTypeSequencer : MonoBehaviour
                 break;
         }
 
+        _prevWasGap = (_lastType == TerrainChunkType.Gap);
         _lastType = nextType;
         return nextType;
     }
 
     public void SetLastType(TerrainChunkType type)
     {
+        _prevWasGap = (_lastType == TerrainChunkType.Gap);
         _lastType = type;
     }
 
@@ -106,7 +109,9 @@ public class TerrainTypeSequencer : MonoBehaviour
             return PickConnectedNonGapType();
         }
 
-        return Random.value < gapChance ? TerrainChunkType.Gap : PickFlatStartNonGapType();
+        // Gap 직후 Flat에서 다시 Gap이 나오면 시각적으로 연속 Gap처럼 보임 → 방지
+        float effectiveGapChance = _prevWasGap ? 0f : gapChance;
+        return Random.value < effectiveGapChance ? TerrainChunkType.Gap : PickFlatStartNonGapType();
     }
 
     private static TerrainChunkType PickFlatStartNonGapType()
