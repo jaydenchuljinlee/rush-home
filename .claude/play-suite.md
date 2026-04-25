@@ -162,6 +162,12 @@ Suite는 **2 Phase**로 나뉜다:
 - 대기: 3초
 - 판정: ForceTerrainCurve 스크립트로 강제 적용 시 각 TerrainTile의 vertexCount == 18 (CurveUp/CurveDown), 접합부 RightTopYOffset == 다음 타일 LeftTopYOffset (오차 0.001 이내), 에러 로그 없음
 
+## F-08: 캐릭터 애니메이션
+- 오브젝트: Player
+- 검증: Ready 상태에서 흰색, Playing+지면에서 초록색, 공중에서 파란색, 슬라이딩에서 노란색으로 SpriteRenderer 색상이 전환됨
+- 대기: 3초 (게임 시작 후 달리기 상태 확인)
+- 판정: Playing 진입 후 Player SpriteRenderer.color가 흰색(1,1,1)이 아닌 초록색(0.2,0.8,0.2) 근사값, Animator 컴포넌트 존재, PlayerAnimationController 컴포넌트 존재, 에러 로그 없음
+
 ## F-07: 배경 파랄랙스
 - 오브젝트: ParallaxBackground, ParallaxBackground/ParallaxLayer_Sky, ParallaxBackground/ParallaxLayer_Far, ParallaxBackground/ParallaxLayer_Near
 - 검증: Playing 상태에서 3개 레이어(Sky/Far/Near)가 각각 다른 속도로 왼쪽으로 스크롤되며, Near > Far > Sky 순으로 빠름
