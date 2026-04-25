@@ -161,3 +161,9 @@ Suite는 **2 Phase**로 나뉜다:
 - 검증: TerrainTypeSequencer를 Normal 이상 티어로 설정 시 CurveUp/CurveDown/SlopeUp/SlopeDown/Gap 타입이 타일에 적용되며, 인접 타일 접합부 높이가 연속됨
 - 대기: 3초
 - 판정: ForceTerrainCurve 스크립트로 강제 적용 시 각 TerrainTile의 vertexCount == 18 (CurveUp/CurveDown), 접합부 RightTopYOffset == 다음 타일 LeftTopYOffset (오차 0.001 이내), 에러 로그 없음
+
+## F-07: 배경 파랄랙스
+- 오브젝트: ParallaxBackground, ParallaxBackground/ParallaxLayer_Sky, ParallaxBackground/ParallaxLayer_Far, ParallaxBackground/ParallaxLayer_Near
+- 검증: Playing 상태에서 3개 레이어(Sky/Far/Near)가 각각 다른 속도로 왼쪽으로 스크롤되며, Near > Far > Sky 순으로 빠름
+- 대기: 3초
+- 판정: 3초 후 각 레이어의 Tile_0 X 좌표가 초기값보다 감소하고, Near 이동량 > Far 이동량 > Sky 이동량 (에러 로그 없음)
