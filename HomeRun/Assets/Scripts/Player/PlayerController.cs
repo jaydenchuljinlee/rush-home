@@ -37,6 +37,11 @@ public class PlayerController : MonoBehaviour
 
     public static event System.Action OnPlayerHit;
 
+#if UNITY_EDITOR
+    /// <summary>디버그 무적 모드. true면 OnPlayerHit을 발동하지 않는다.</summary>
+    public static bool DebugInvincible { get; set; } = true;
+#endif
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -55,6 +60,7 @@ public class PlayerController : MonoBehaviour
         CheckGround();
         HandleInput();
         UpdateSlide();
+        CheckFallDeath();
     }
 
     private void CheckGround()
@@ -173,10 +179,38 @@ public class PlayerController : MonoBehaviour
         transform.localScale = _normalScale;
     }
 
+    private void CheckFallDeath()
+    {
+        if (transform.position.y < -2f && _rigidbody.linearVelocity.y < -1f)
+        {
+            // 떨어지기 시작할 때 바로 기록
+            var gs = FindAnyObjectByType<GroundScroller>();
+            if (gs != null)
+            {
+                for (int i = 0; i < gs.transform.childCount; i++)
+                {
+                    var child = gs.transform.GetChild(i);
+                    var tt = child.GetComponent<TerrainTile>();
+                    if (tt != null)
+                    {
+                        float dist = Mathf.Abs(child.position.x - transform.position.x);
+                        if (dist < 20f)
+                            Debug.LogError($"[FALL] Tile '{child.name}' X={child.position.x:F1} type={tt.CurrentType} L={tt.LeftTopYOffset:F2} R={tt.RightTopYOffset:F2} hasGround={tt.HasGround}");
+                    }
+                }
+                Debug.LogError($"[FALL] Player X={transform.position.x:F1} Y={transform.position.y:F1} velY={_rigidbody.linearVelocity.y:F1}");
+            }
+            OnPlayerHit?.Invoke();
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Obstacle"))
         {
+#if UNITY_EDITOR
+            if (DebugInvincible) return;
+#endif
             OnPlayerHit?.Invoke();
         }
     }

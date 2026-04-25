@@ -228,13 +228,15 @@ public class TerrainTile : MonoBehaviour
         _mesh.triangles = new[] { 0, 1, 2, 0, 2, 3 };
         _mesh.RecalculateBounds();
 
+        // 콜라이더를 메시보다 양쪽 0.2 넓게 → 인접 타일과 콜라이더가 겹쳐 틈새 방지
+        float colliderOverlap = 0.2f;
         polygonCollider.pathCount = 1;
         polygonCollider.SetPath(0, new[]
         {
-            new Vector2(-halfWidth, bottomY),
-            new Vector2(-halfWidth, leftTopY),
-            new Vector2(halfWidth, rightTopY),
-            new Vector2(halfWidth, bottomY)
+            new Vector2(-halfWidth - colliderOverlap, bottomY),
+            new Vector2(-halfWidth - colliderOverlap, leftTopY),
+            new Vector2(halfWidth + colliderOverlap, rightTopY),
+            new Vector2(halfWidth + colliderOverlap, bottomY)
         });
     }
 
@@ -301,16 +303,23 @@ public class TerrainTile : MonoBehaviour
         _mesh.triangles = triangles;
         _mesh.RecalculateBounds();
 
-        // PolygonCollider2D: 상단 경로(좌→우) + 하단 역순(우→좌)
-        Vector2[] colliderPath = new Vector2[2 * (n + 1)];
+        // 콜라이더를 양쪽 0.2 확장하여 인접 타일과 겹침 → 틈새 방지
+        float colliderOverlap = 0.2f;
+        Vector2[] colliderPath = new Vector2[2 * (n + 1) + 4];
+        // 좌측 확장 하단
+        colliderPath[0] = new Vector2(-halfWidth - colliderOverlap, bottomY);
+        // 좌측 확장 상단
+        colliderPath[1] = new Vector2(-halfWidth - colliderOverlap, colliderTop[0].y);
+        // 상단 경로(좌→우)
         for (int i = 0; i <= n; i++)
-        {
-            colliderPath[i] = colliderTop[i];
-        }
-        for (int i = 0; i <= n; i++)
-        {
-            colliderPath[n + 1 + i] = colliderBottom[n - i];
-        }
+            colliderPath[2 + i] = colliderTop[i];
+        // 우측 확장 상단
+        colliderPath[2 + n + 1] = new Vector2(halfWidth + colliderOverlap, colliderTop[n].y);
+        // 우측 확장 하단
+        colliderPath[2 + n + 2] = new Vector2(halfWidth + colliderOverlap, bottomY);
+        // 하단 역순(우→좌) — 중간 하단점 생략, 좌우 확장이 이미 닫음
+        // 단순화: 사각형 하단으로 닫기
+        colliderPath[2 + n + 3] = new Vector2(-halfWidth - colliderOverlap, bottomY);
 
         polygonCollider.pathCount = 1;
         polygonCollider.SetPath(0, colliderPath);

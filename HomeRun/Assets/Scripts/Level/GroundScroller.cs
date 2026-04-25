@@ -18,6 +18,9 @@ public class GroundScroller : MonoBehaviour
     private TerrainTile[] _terrainTiles;
     private float _lastMoveAmount;
 
+    /// <summary>마지막으로 오른쪽에 배치된 타일의 RightTopYOffset. 다음 타일의 leftTopYOffset으로 사용.</summary>
+    private float _lastPlacedRightTopYOffset;
+
     public float ScrollSpeed
     {
         get => scrollSpeed;
@@ -64,12 +67,13 @@ public class GroundScroller : MonoBehaviour
             tile.position += Vector3.left * moveAmount;
         }
 
+        float totalWidth = _tiles.Length * tileWidth;
         foreach (Transform tile in _tiles)
         {
             if (ShouldRecycle(tile))
             {
-                float rightmostX = GetRightmostX();
-                tile.position = new Vector3(rightmostX + tileWidth, tile.position.y, tile.position.z);
+                // 타일 수 × 타일폭만큼 오른쪽으로 이동 — 드리프트 없이 정확히 이어붙임
+                tile.position += new Vector3(totalWidth, 0f, 0f);
                 ApplyNextTerrainType(tile);
             }
         }
@@ -180,10 +184,12 @@ public class GroundScroller : MonoBehaviour
             ? terrainSequencer.GetNextType()
             : TerrainChunkType.Flat;
 
-        float leftTopYOffset = GetRightmostTerrainTile(index)?.RightTopYOffset ?? 0f;
+        // 이전 타일의 RightTopYOffset을 정확히 이어받음
+        float leftTopYOffset = _lastPlacedRightTopYOffset;
         nextType = ClampTerrainTypeToHeightRange(nextType, leftTopYOffset, terrainTile.SlopeHeightDelta);
         terrainSequencer?.SetLastType(nextType);
         terrainTile.SetType(nextType, leftTopYOffset);
+        _lastPlacedRightTopYOffset = terrainTile.RightTopYOffset;
     }
 
     private TerrainChunkType ClampTerrainTypeToHeightRange(
@@ -208,7 +214,7 @@ public class GroundScroller : MonoBehaviour
 
     private void InitializeTerrainTiles()
     {
-        TerrainTile previousTile = null;
+        _lastPlacedRightTopYOffset = 0f;
 
         for (int i = 0; i < _terrainTiles.Length; i++)
         {
@@ -221,31 +227,9 @@ public class GroundScroller : MonoBehaviour
             TerrainChunkType type = i == 0 || terrainSequencer == null
                 ? TerrainChunkType.Flat
                 : terrainSequencer.GetNextType();
-            float leftTopYOffset = previousTile != null ? previousTile.RightTopYOffset : 0f;
-            terrainTile.SetType(type, leftTopYOffset);
-            previousTile = terrainTile;
+            terrainTile.SetType(type, _lastPlacedRightTopYOffset);
+            _lastPlacedRightTopYOffset = terrainTile.RightTopYOffset;
         }
     }
 
-    private TerrainTile GetRightmostTerrainTile(int excludedIndex)
-    {
-        TerrainTile rightmostTerrainTile = null;
-        float rightmostX = float.MinValue;
-
-        for (int i = 0; i < _tiles.Length; i++)
-        {
-            if (i == excludedIndex || _terrainTiles[i] == null)
-            {
-                continue;
-            }
-
-            if (_tiles[i].position.x > rightmostX)
-            {
-                rightmostX = _tiles[i].position.x;
-                rightmostTerrainTile = _terrainTiles[i];
-            }
-        }
-
-        return rightmostTerrainTile;
-    }
 }

@@ -6,8 +6,8 @@ using UnityEngine;
 /// </summary>
 public class TerrainTypeSequencer : MonoBehaviour
 {
-    [SerializeField] private float hardGapChance = 0.15f;
-    [SerializeField] private float extremeGapChance = 0.25f;
+    [SerializeField] private float hardGapChance = 0f;
+    [SerializeField] private float extremeGapChance = 0f;
 
     private DifficultyTier _currentTier = DifficultyTier.Easy;
     private TerrainChunkType _lastType = TerrainChunkType.Flat;

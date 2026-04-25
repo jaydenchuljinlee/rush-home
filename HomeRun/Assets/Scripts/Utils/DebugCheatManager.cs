@@ -1,6 +1,4 @@
 #if UNITY_EDITOR
-using System;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,11 +12,6 @@ using UnityEngine.InputSystem;
 public class DebugCheatManager : MonoBehaviour
 {
     private bool _isInvincible = false;
-    private Delegate _savedDelegate = null;
-
-    private static readonly FieldInfo OnPlayerHitField = typeof(PlayerController)
-        .GetField("OnPlayerHit", BindingFlags.NonPublic | BindingFlags.Static)
-        ?? typeof(PlayerController).GetField("OnPlayerHit", BindingFlags.Public | BindingFlags.Static);
 
     private void Update()
     {
@@ -36,15 +29,10 @@ public class DebugCheatManager : MonoBehaviour
         if (GameManager.Instance != null && !GameManager.IsPlaying)
             GameManager.Instance.StartGame();
 
-        // DifficultyManager의 디버그 오버라이드로 매 프레임 덮어쓰기 방지
         if (DifficultyManager.Instance != null)
         {
             DifficultyManager.Instance.SetDebugTierOverride(tier);
             Debug.Log($"[DEBUG] Difficulty Override → {tier}");
-        }
-        else
-        {
-            Debug.LogWarning("[DebugCheatManager] DifficultyManager not found");
         }
     }
 
@@ -62,46 +50,16 @@ public class DebugCheatManager : MonoBehaviour
 
     private void EnableInvincible()
     {
-        if (OnPlayerHitField == null)
-        {
-            Debug.LogWarning("[DebugCheatManager] OnPlayerHit backing field를 찾을 수 없습니다.");
-            return;
-        }
-
-        _savedDelegate = OnPlayerHitField.GetValue(null) as Delegate;
-        OnPlayerHitField.SetValue(null, null);
-
+        PlayerController.DebugInvincible = true;
         _isInvincible = true;
-        Debug.Log("[DEBUG] INVINCIBLE: ON — 장애물 충돌 무시됨");
+        Debug.Log("[DEBUG] INVINCIBLE: ON");
     }
 
     private void DisableInvincible()
     {
-        if (OnPlayerHitField == null)
-        {
-            Debug.LogWarning("[DebugCheatManager] OnPlayerHit backing field를 찾을 수 없습니다.");
-            return;
-        }
-
-        if (_savedDelegate != null)
-        {
-            OnPlayerHitField.SetValue(null, _savedDelegate);
-            _savedDelegate = null;
-        }
-        else if (GameManager.Instance != null)
-        {
-            // 저장된 delegate가 없으면 GameManager.HandlePlayerHit을 직접 재등록
-            var handlePlayerHit = typeof(GameManager)
-                .GetMethod("HandlePlayerHit", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (handlePlayerHit != null)
-            {
-                var action = (Action)Delegate.CreateDelegate(typeof(Action), GameManager.Instance, handlePlayerHit);
-                PlayerController.OnPlayerHit += action;
-            }
-        }
-
+        PlayerController.DebugInvincible = false;
         _isInvincible = false;
-        Debug.Log("[DEBUG] INVINCIBLE: OFF — 정상 충돌 처리 복원됨");
+        Debug.Log("[DEBUG] INVINCIBLE: OFF");
     }
 
     private void OnGUI()

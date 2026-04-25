@@ -831,8 +831,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95d405ff3ecbd4e319f57400efbb6a9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: HomeRun.Runtime::TerrainTypeSequencer
-  hardGapChance: 0.15
-  extremeGapChance: 0.25
+  hardGapChance: 0
+  extremeGapChance: 0
 --- !u!4 &375770157
 Transform:
   m_ObjectHideFlags: 0
