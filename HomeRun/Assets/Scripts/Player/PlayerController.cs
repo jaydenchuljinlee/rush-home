@@ -150,17 +150,11 @@ public class PlayerController : MonoBehaviour
         _isSliding = true;
         _slideTimer = slideDuration;
 
-        // 콜라이더를 줄임 — AirObstacle을 피할 수 있는 최소한의 높이 (달릴 때와 거의 같은 크기 유지)
-        float slideRatio = 0.7f;
-        _collider.size = new Vector2(_normalColliderSize.x, _normalColliderSize.y * slideRatio);
-        _collider.offset = new Vector2(_normalColliderOffset.x, _normalColliderOffset.y - _normalColliderSize.y * (1f - slideRatio) * 0.5f);
-
-        // 스프라이트 스케일을 콜라이더 비율에 맞게 납작하게 조정
-        transform.localScale = new Vector3(
-            _normalScale.x,
-            _normalScale.y * slideRatio,
-            _normalScale.z
-        );
+        // 콜라이더 높이만 살짝 줄여 AirObstacle을 피함 (스프라이트 크기는 유지)
+        float slideHeight = 0.89f;
+        float heightDiff = _normalColliderSize.y - slideHeight;
+        _collider.size = new Vector2(_normalColliderSize.x, slideHeight);
+        _collider.offset = new Vector2(_normalColliderOffset.x, _normalColliderOffset.y - heightDiff * 0.5f);
     }
 
     private void UpdateSlide()
@@ -180,8 +174,7 @@ public class PlayerController : MonoBehaviour
         _collider.size = _normalColliderSize;
         _collider.offset = _normalColliderOffset;
 
-        // 스프라이트 스케일 복구
-        transform.localScale = _normalScale;
+        // 스프라이트 스케일은 변경하지 않으므로 복구 불필요
     }
 
     private void CheckFallDeath()
