@@ -23,7 +23,7 @@ public class RunAnimationTests : ICallbacks
         var filter = new Filter()
         {
             testMode = TestMode.EditMode,
-            testNames = new[] { "PlayerAnimationControllerTest" }
+            testNames = new[] { "PlayerAnimationControllerTest", "PlayerAnimationControllerV2Test" }
         };
 
         api.Execute(new ExecutionSettings(filter));

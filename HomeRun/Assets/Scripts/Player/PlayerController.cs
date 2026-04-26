@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
     private bool _isGrounded;
     private bool _isSliding;
     private float _slideTimer;
+    private Vector3 _spawnPosition;
+    private bool _spawnPositionLocked;
 
     // 스와이프 감지
     private Vector2 _touchStartPos;
@@ -51,11 +53,51 @@ public class PlayerController : MonoBehaviour
         _normalColliderSize = _collider.size;
         _normalColliderOffset = _collider.offset;
         _normalScale = transform.localScale;
+        // 초기값은 Awake 시점 위치로 설정. 실제 스폰 위치는 게임 시작 직전 Update()에서 확정된다.
+        _spawnPosition = transform.position;
+        _spawnPositionLocked = false;
+    }
+
+    /// <summary>
+    /// 플레이어를 초기 스폰 위치로 리셋한다. 재시작 시 호출.
+    /// </summary>
+    public void ResetPosition()
+    {
+        transform.position = _spawnPosition;
+        if (_rigidbody != null)
+        {
+            _rigidbody.linearVelocity = Vector2.zero;
+            _rigidbody.angularVelocity = 0f;
+        }
+
+        // 슬라이드 상태 초기화
+        if (_isSliding)
+        {
+            EndSlide();
+        }
+        _isSliding = false;
+        _slideTimer = 0f;
+
+        // 다음 게임 시작 시 스폰 위치를 다시 확정한다.
+        _spawnPositionLocked = false;
     }
 
     private void Update()
     {
+        // Ready 상태에서는 매 프레임 스폰 위치를 업데이트한다 (지면 정착 후 정확한 위치 캐싱).
+        if (!_spawnPositionLocked && GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Ready)
+        {
+            _spawnPosition = transform.position;
+        }
+
         if (!GameManager.IsPlaying) return;
+
+        // 게임 시작 직후 한 번만 스폰 위치를 확정한다.
+        if (!_spawnPositionLocked)
+        {
+            _spawnPosition = transform.position;
+            _spawnPositionLocked = true;
+        }
 
         CheckGround();
         HandleInput();
@@ -150,10 +192,11 @@ public class PlayerController : MonoBehaviour
         _isSliding = true;
         _slideTimer = slideDuration;
 
-        // 콜라이더를 줄임 — 빨간 박스를 아슬아슬하게 피할 수 있는 높이
-        float slideRatio = 0.4f;
-        _collider.size = new Vector2(_normalColliderSize.x, _normalColliderSize.y * slideRatio);
-        _collider.offset = new Vector2(_normalColliderOffset.x, _normalColliderOffset.y - _normalColliderSize.y * (1f - slideRatio) * 0.5f);
+        // 콜라이더 높이만 살짝 줄여 AirObstacle을 피함 (스프라이트 크기는 유지)
+        float slideHeight = 0.89f;
+        float heightDiff = _normalColliderSize.y - slideHeight;
+        _collider.size = new Vector2(_normalColliderSize.x, slideHeight);
+        _collider.offset = new Vector2(_normalColliderOffset.x, _normalColliderOffset.y - heightDiff * 0.5f);
     }
 
     private void UpdateSlide()
@@ -173,8 +216,7 @@ public class PlayerController : MonoBehaviour
         _collider.size = _normalColliderSize;
         _collider.offset = _normalColliderOffset;
 
-        // 스프라이트 스케일 복구
-        transform.localScale = _normalScale;
+        // 스프라이트 스케일은 변경하지 않으므로 복구 불필요
     }
 
     private void CheckFallDeath()

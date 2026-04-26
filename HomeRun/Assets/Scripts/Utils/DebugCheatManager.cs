@@ -25,9 +25,19 @@ public class DebugCheatManager : MonoBehaviour
 
     private void SetDifficultyTier(DifficultyTier tier)
     {
-        // Ready 상태면 게임 시작
-        if (GameManager.Instance != null && !GameManager.IsPlaying)
-            GameManager.Instance.StartGame();
+        if (GameManager.Instance != null)
+        {
+            if (GameManager.Instance.CurrentState == GameState.GameOver)
+            {
+                // 게임오버 상태: 플레이어/장애물을 초기 위치로 리셋 후 재시작
+                GameManager.Instance.SoftRestart();
+            }
+            else if (!GameManager.IsPlaying)
+            {
+                // Ready 상태: 일반 시작
+                GameManager.Instance.StartGame();
+            }
+        }
 
         if (DifficultyManager.Instance != null)
         {
