@@ -19,6 +19,7 @@ public class GameUIController : MonoBehaviour
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI finalTimeText;
     [SerializeField] private Button restartButton;
+    [SerializeField] private Button mainMenuButton;
 
     private void OnEnable()
     {
@@ -47,6 +48,9 @@ public class GameUIController : MonoBehaviour
 
         if (restartButton != null)
             restartButton.onClick.AddListener(OnRestartClicked);
+
+        if (mainMenuButton != null)
+            mainMenuButton.onClick.AddListener(OnMainMenuClicked);
     }
 
     private void Update()
@@ -82,6 +86,11 @@ public class GameUIController : MonoBehaviour
     {
         if (GameManager.Instance != null)
             GameManager.Instance.RestartGame();
+    }
+
+    private void OnMainMenuClicked()
+    {
+        SceneLoader.LoadMainMenu();
     }
 
     public static string FormatTime(float time)
