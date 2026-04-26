@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
     private bool _isGrounded;
     private bool _isSliding;
     private float _slideTimer;
+    private Vector3 _spawnPosition;
+    private bool _spawnPositionLocked;
 
     // 스와이프 감지
     private Vector2 _touchStartPos;
@@ -51,11 +53,51 @@ public class PlayerController : MonoBehaviour
         _normalColliderSize = _collider.size;
         _normalColliderOffset = _collider.offset;
         _normalScale = transform.localScale;
+        // 초기값은 Awake 시점 위치로 설정. 실제 스폰 위치는 게임 시작 직전 Update()에서 확정된다.
+        _spawnPosition = transform.position;
+        _spawnPositionLocked = false;
+    }
+
+    /// <summary>
+    /// 플레이어를 초기 스폰 위치로 리셋한다. 재시작 시 호출.
+    /// </summary>
+    public void ResetPosition()
+    {
+        transform.position = _spawnPosition;
+        if (_rigidbody != null)
+        {
+            _rigidbody.linearVelocity = Vector2.zero;
+            _rigidbody.angularVelocity = 0f;
+        }
+
+        // 슬라이드 상태 초기화
+        if (_isSliding)
+        {
+            EndSlide();
+        }
+        _isSliding = false;
+        _slideTimer = 0f;
+
+        // 다음 게임 시작 시 스폰 위치를 다시 확정한다.
+        _spawnPositionLocked = false;
     }
 
     private void Update()
     {
+        // Ready 상태에서는 매 프레임 스폰 위치를 업데이트한다 (지면 정착 후 정확한 위치 캐싱).
+        if (!_spawnPositionLocked && GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Ready)
+        {
+            _spawnPosition = transform.position;
+        }
+
         if (!GameManager.IsPlaying) return;
+
+        // 게임 시작 직후 한 번만 스폰 위치를 확정한다.
+        if (!_spawnPositionLocked)
+        {
+            _spawnPosition = transform.position;
+            _spawnPositionLocked = true;
+        }
 
         CheckGround();
         HandleInput();

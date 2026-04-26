@@ -13,6 +13,8 @@ public class ObstaclePool : MonoBehaviour
     private readonly Dictionary<GameObject, Queue<Obstacle>> _pools = new Dictionary<GameObject, Queue<Obstacle>>();
     // 인스턴스 -> 원본 프리팹 매핑 (반환 시 어떤 풀로 돌아갈지 결정)
     private readonly Dictionary<Obstacle, GameObject> _prefabLookup = new Dictionary<Obstacle, GameObject>();
+    // 현재 활성 상태인 장애물 목록
+    private readonly HashSet<Obstacle> _activeObstacles = new HashSet<Obstacle>();
 
     /// <summary>
     /// 풀에서 장애물을 꺼낸다. 풀이 비어 있으면 신규 생성.
@@ -38,6 +40,7 @@ public class ObstaclePool : MonoBehaviour
         }
 
         obstacle.OnSpawnFromPool();
+        _activeObstacles.Add(obstacle);
         return obstacle;
     }
 
@@ -46,6 +49,7 @@ public class ObstaclePool : MonoBehaviour
     /// </summary>
     public void Return(Obstacle obstacle)
     {
+        _activeObstacles.Remove(obstacle);
         obstacle.OnReturnToPool();
 
         if (_prefabLookup.TryGetValue(obstacle, out GameObject prefab))
@@ -61,6 +65,21 @@ public class ObstaclePool : MonoBehaviour
             // 풀 정보가 없으면 제거
             Destroy(obstacle.gameObject);
         }
+    }
+
+    /// <summary>
+    /// 현재 활성화된 장애물을 모두 풀에 반환한다. 재시작 시 호출.
+    /// </summary>
+    public void ReturnAll()
+    {
+        // 복사본으로 반복 (Return 내부에서 _activeObstacles 수정되므로)
+        var toReturn = new List<Obstacle>(_activeObstacles);
+        foreach (var obstacle in toReturn)
+        {
+            if (obstacle != null)
+                Return(obstacle);
+        }
+        _activeObstacles.Clear();
     }
 
     private Obstacle CreateNew(GameObject prefab, Vector3 position)

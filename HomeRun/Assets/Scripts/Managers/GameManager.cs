@@ -83,6 +83,30 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+    /// <summary>
+    /// 씬 재로드 없이 게임을 초기 상태로 리셋하고 시작한다.
+    /// 플레이어 위치, 장애물 풀, 스포너 상태를 리셋한다.
+    /// </summary>
+    public void SoftRestart()
+    {
+        // 플레이어 위치 리셋
+        var player = FindFirstObjectByType<PlayerController>();
+        if (player != null)
+        {
+            player.ResetPosition();
+        }
+
+        // 장애물 풀 반환 (활성 장애물 모두 제거)
+        var pool = FindFirstObjectByType<ObstaclePool>();
+        if (pool != null)
+        {
+            pool.ReturnAll();
+        }
+
+        ElapsedTime = 0f;
+        ChangeState(GameState.Playing);
+    }
+
     private void HandlePlayerHit()
     {
         GameOver();
