@@ -17,9 +17,12 @@ Codex should treat `HomeRun/` as the Unity project root when looking for `Assets
 ## Operating Model
 
 - Prefer natural-language requests over slash commands.
+- For non-trivial work, prompts should make the goal, relevant context, constraints, and done criteria explicit.
+- Plan before implementing when a task is ambiguous, multi-step, or likely to touch multiple Unity systems.
 - Use `.codex/workflows/` for multi-step execution.
 - Use `.codex/templates/` when creating plans, reports, or suite entries.
 - Reuse `.claude/bugs/`, `.claude/plans/`, and `.claude/play-suite.md` as working records unless the user asks to migrate the historical data too.
+- Keep `AGENTS.md` concise and durable. Put task-specific detail in `.codex/workflows/`, `.codex/templates/`, or a plan file.
 
 ## Core Engineering Rules
 
@@ -69,8 +72,31 @@ Detailed guidance:
 ## Build / Validation
 
 - Compile or test before claiming completion when the environment allows it.
+- For documentation/configuration-only work, validate the edited files directly and review the diff instead of running Unity tests.
 - If Unity or Coplay is unavailable, state the limitation explicitly.
 - For build and test commands, prefer the Unity batch examples documented in `.codex/workflows/feature-workflow.md`.
+- Completion means the requested behavior or configuration is changed, relevant checks have run or been explicitly skipped with reason, and risky assumptions are called out.
+
+## Review Loop
+
+- Review the diff before final handoff.
+- Check for scope drift, accidental Unity asset churn, and unrelated formatting changes.
+- Add or update focused tests when product code behavior changes and the project has an appropriate test layer.
+- Do not mark PR template test checkboxes unless that exact validation actually ran.
+
+## Codex Configuration
+
+- Keep personal defaults, credentials, and trust decisions in `~/.codex/config.toml`.
+- Keep shared repo behavior in `.codex/config.toml`.
+- Prefer tight sandboxing and approval defaults; loosen only for trusted repository workflows.
+- Use MCP only when it removes a real manual loop. This project uses Coplay MCP for Unity editor context and runtime verification.
+- Repeated workflows should live in `.codex/skills/` or `.codex/workflows/` before becoming scheduled automation.
+
+## Session Hygiene
+
+- Keep one Codex thread per coherent unit of work.
+- Use compacting or a fresh thread when context gets stale or the task meaningfully branches.
+- Use subagents only for bounded parallel work with a clear output.
 
 ## Git Flow
 
