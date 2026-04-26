@@ -154,6 +154,13 @@ public class PlayerController : MonoBehaviour
         float slideRatio = 0.4f;
         _collider.size = new Vector2(_normalColliderSize.x, _normalColliderSize.y * slideRatio);
         _collider.offset = new Vector2(_normalColliderOffset.x, _normalColliderOffset.y - _normalColliderSize.y * (1f - slideRatio) * 0.5f);
+
+        // 스프라이트 스케일을 콜라이더 비율에 맞게 납작하게 조정
+        transform.localScale = new Vector3(
+            _normalScale.x,
+            _normalScale.y * slideRatio,
+            _normalScale.z
+        );
     }
 
     private void UpdateSlide()

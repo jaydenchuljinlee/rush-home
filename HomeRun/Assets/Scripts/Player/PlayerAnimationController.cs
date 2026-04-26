@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -15,9 +16,15 @@ public class PlayerAnimationController : MonoBehaviour
     private static readonly int ParamIsSliding  = Animator.StringToHash("isSliding");
     private static readonly int ParamHit        = Animator.StringToHash("hit");
 
+    [Header("Hit Flash")]
+    [SerializeField] private Color hitFlashColor = Color.red;
+    [SerializeField] private float hitFlashDuration = 0.1f;
+    [SerializeField] private int hitFlashCount = 3;
+
     private Animator         _animator;
     private SpriteRenderer   _spriteRenderer;
     private PlayerController _playerController;
+    private Coroutine        _hitFlashCoroutine;
 
     private void Awake()
     {
@@ -64,12 +71,45 @@ public class PlayerAnimationController : MonoBehaviour
     private void HandlePlayerHit()
     {
         _animator.SetTrigger(ParamHit);
+        StartHitFlash();
+    }
+
+    /// <summary>Hit 발생 시 빨간색 플래시 효과를 시작한다.</summary>
+    private void StartHitFlash()
+    {
+        if (_hitFlashCoroutine != null)
+        {
+            StopCoroutine(_hitFlashCoroutine);
+        }
+        _hitFlashCoroutine = StartCoroutine(HitFlashCoroutine());
+    }
+
+    private IEnumerator HitFlashCoroutine()
+    {
+        Color originalColor = _spriteRenderer.color;
+
+        for (int i = 0; i < hitFlashCount; i++)
+        {
+            _spriteRenderer.color = hitFlashColor;
+            yield return new WaitForSeconds(hitFlashDuration);
+            _spriteRenderer.color = originalColor;
+            yield return new WaitForSeconds(hitFlashDuration);
+        }
+
+        _spriteRenderer.color = originalColor;
+        _hitFlashCoroutine = null;
     }
 
     private void HandleGameStateChanged(GameState newState)
     {
         if (newState == GameState.Ready)
         {
+            // 게임 재시작 시 플래시 효과 중단 및 색상 복원
+            if (_hitFlashCoroutine != null)
+            {
+                StopCoroutine(_hitFlashCoroutine);
+                _hitFlashCoroutine = null;
+            }
             _spriteRenderer.color = Color.white;
         }
     }
