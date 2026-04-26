@@ -150,8 +150,8 @@ public class PlayerController : MonoBehaviour
         _isSliding = true;
         _slideTimer = slideDuration;
 
-        // 콜라이더를 줄임 — 빨간 박스를 아슬아슬하게 피할 수 있는 높이
-        float slideRatio = 0.4f;
+        // 콜라이더를 줄임 — AirObstacle을 피할 수 있는 최소한의 높이 (달릴 때와 거의 같은 크기 유지)
+        float slideRatio = 0.7f;
         _collider.size = new Vector2(_normalColliderSize.x, _normalColliderSize.y * slideRatio);
         _collider.offset = new Vector2(_normalColliderOffset.x, _normalColliderOffset.y - _normalColliderSize.y * (1f - slideRatio) * 0.5f);
 

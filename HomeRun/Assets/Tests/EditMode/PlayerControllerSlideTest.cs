@@ -61,16 +61,16 @@ public class PlayerControllerSlideTest
     // ------------------------------------------------------------------
 
     [Test]
-    public void 성공_슬라이딩시_Y스케일이_절반으로_변경됨()
+    public void 성공_슬라이딩시_Y스케일이_줄어듦()
     {
         // Arrange
         Vector3 originalScale = _playerGo.transform.localScale;
         ForceSlideStart();
 
-        // Assert
-        float expectedY = originalScale.y * 0.5f;
+        // Assert: slideRatio = 0.7, AirObstacle을 피할 수 있는 최소 축소
+        float expectedY = originalScale.y * 0.7f;
         Assert.AreEqual(expectedY, _playerGo.transform.localScale.y, 0.001f,
-            "슬라이딩 중 Y 스케일은 원본의 0.5 배여야 한다");
+            "슬라이딩 중 Y 스케일은 원본의 0.7 배여야 한다");
     }
 
     [Test]
@@ -105,15 +105,15 @@ public class PlayerControllerSlideTest
     // ------------------------------------------------------------------
 
     [Test]
-    public void 성공_슬라이딩시_콜라이더_높이가_절반으로_줄어듦()
+    public void 성공_슬라이딩시_콜라이더_높이가_줄어듦()
     {
         // Arrange
         float originalHeight = _collider.size.y;
         ForceSlideStart();
 
-        // Assert
-        Assert.AreEqual(originalHeight * 0.5f, _collider.size.y, 0.001f,
-            "슬라이딩 중 콜라이더 높이는 원본의 0.5 배여야 한다");
+        // Assert: slideRatio = 0.7
+        Assert.AreEqual(originalHeight * 0.7f, _collider.size.y, 0.001f,
+            "슬라이딩 중 콜라이더 높이는 원본의 0.7 배여야 한다");
     }
 
     [Test]
