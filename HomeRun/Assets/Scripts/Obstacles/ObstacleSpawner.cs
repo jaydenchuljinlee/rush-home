@@ -37,8 +37,8 @@ public class ObstacleSpawner : MonoBehaviour
     [Header("Y 위치 설정")]
     [Tooltip("바닥 장애물 스폰 Y (지면 상단 = 0)")]
     [SerializeField] private float groundObstacleY = 0f;
-    [Tooltip("공중 장애물 스폰 Y (플레이어 머리 높이 기준)")]
-    [SerializeField] private float airObstacleY = 0.8f;
+    [Tooltip("지면 기준 공중 장애물 Y 오프셋 (플레이어 머리 높이)")]
+    [SerializeField] private float airObstacleYOffset = 0.8f;
 
     /// <summary>마지막 스폰 이후 누적 이동 거리</summary>
     private float _distanceSinceLastSpawn;
@@ -140,15 +140,17 @@ public class ObstacleSpawner : MonoBehaviour
 
         _lastSpawnedType = currentType;
 
-        // 장애물 타입에 따라 Y 결정
-        float spawnY = groundObstacleY;
+        // 장애물 타입에 따라 Y 결정 (경사 지면 기준)
+        float groundY = groundScroller != null ? groundScroller.GetGroundY(spawnX) : 0f;
+        float spawnY;
         if (prefabObstacle != null && prefabObstacle.ObstacleType == ObstacleType.Air)
         {
-            spawnY = airObstacleY;
+            // 지면 + 플레이어 머리 높이 기준
+            spawnY = groundY + airObstacleYOffset;
         }
-        else if (groundScroller != null)
+        else
         {
-            spawnY = groundScroller.GetGroundY(spawnX) + groundObstacleY;
+            spawnY = groundY + groundObstacleY;
         }
 
         Vector3 spawnPos = new Vector3(spawnX, spawnY, 0f);

@@ -150,12 +150,10 @@ public class PlayerController : MonoBehaviour
         _isSliding = true;
         _slideTimer = slideDuration;
 
-        // 콜라이더를 절반 높이로 줄임
-        _collider.size = new Vector2(_normalColliderSize.x, _normalColliderSize.y * 0.5f);
-        _collider.offset = new Vector2(_normalColliderOffset.x, _normalColliderOffset.y - _normalColliderSize.y * 0.25f);
-
-        // 스프라이트 Y 스케일 0.5로 줄여 시각 피드백 제공
-        transform.localScale = new Vector3(_normalScale.x, _normalScale.y * 0.5f, _normalScale.z);
+        // 콜라이더를 줄임 — 빨간 박스를 아슬아슬하게 피할 수 있는 높이
+        float slideRatio = 0.4f;
+        _collider.size = new Vector2(_normalColliderSize.x, _normalColliderSize.y * slideRatio);
+        _collider.offset = new Vector2(_normalColliderOffset.x, _normalColliderOffset.y - _normalColliderSize.y * (1f - slideRatio) * 0.5f);
     }
 
     private void UpdateSlide()
