@@ -1,0 +1,12 @@
+# Repository-specific Codex defaults for HomeRun.
+# Keep personal preferences and trust decisions in ~/.codex/config.toml.
+
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+[mcp_servers.coplay-mcp]
+command = "uvx"
+args = ["--python", ">=3.11", "coplay-mcp-server@latest"]
+
+[mcp_servers.coplay-mcp.env]
+MCP_TOOL_TIMEOUT = "720000"
