@@ -173,3 +173,9 @@ Suite는 **2 Phase**로 나뉜다:
 - 검증: Playing 상태에서 3개 레이어(Sky/Far/Near)가 각각 다른 속도로 왼쪽으로 스크롤되며, Near > Far > Sky 순으로 빠름
 - 대기: 3초
 - 판정: 3초 후 각 레이어의 Tile_0 X 좌표가 초기값보다 감소하고, Near 이동량 > Far 이동량 > Sky 이동량 (에러 로그 없음)
+
+## F-09: 메인메뉴 씬
+- 오브젝트: MainMenuController, Canvas, Canvas/TitleText, Canvas/StartButton
+- 검증: MainMenu 씬 플레이 시 TitleText("HomeRun")와 StartButton("Start")이 표시되고, GameScene의 GameOver 패널에 메인메뉴 버튼이 존재함
+- 대기: 2초
+- 판정: MainMenu 씬에서 MainMenuController 오브젝트 존재 + Canvas/StartButton 존재 + GameScene GameOverPanel 하위에 MainMenuButton 존재 + 에러 로그 없음
