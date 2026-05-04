@@ -72,4 +72,4 @@ secrets.*
 .claude/settings.local.json
 
 # Coplay MCP runtime data
-HomeRun/Packages/Coplay/
+RushHome/Packages/Coplay/

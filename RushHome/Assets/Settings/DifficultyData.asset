@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0d74f94bfe664995bf32106c0ac67fa, type: 3}
+  m_Name: DifficultyData
+  m_EditorClassIdentifier: Assembly-CSharp::DifficultyData
+  tiers:
+  - tier: 0
+    startTime: 0
+    scrollSpeed: 8
+    spawnIntervalMin: 1.5
+    spawnIntervalMax: 3
+  - tier: 1
+    startTime: 30
+    scrollSpeed: 12
+    spawnIntervalMin: 1.2
+    spawnIntervalMax: 2.5
+  - tier: 2
+    startTime: 60
+    scrollSpeed: 16
+    spawnIntervalMin: 0.9
+    spawnIntervalMax: 2
+  - tier: 3
+    startTime: 120
+    scrollSpeed: 22
+    spawnIntervalMin: 0.6
+    spawnIntervalMax: 1.5

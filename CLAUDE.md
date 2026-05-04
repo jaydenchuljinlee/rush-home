@@ -1,48 +1,40 @@
-# HomeRun 프로젝트 CLAUDE.md
+# RushHome 3D - Claude Rules
 
-## Coplay MCP 사용 시 주의사항
+## 프로젝트 개요
+- Unity 6 LTS / Universal 3D (URP) 프로젝트
+- 3D 러너 게임 (rush-home 2D → 3D 변환)
+- 프로젝트 경로: `RushHome/`
 
-### 씬 오브젝트에 컴포넌트 부착 확인 필수
-- `create_game_object`로 오브젝트를 만든 후 반드시 `add_component`로 스크립트 컴포넌트를 부착한다
-- 완료 후 `list_game_objects_in_hierarchy`(onlyPaths: false)로 컴포넌트가 실제로 붙었는지 검증한다
-- 실수 사례: GameManager 오브젝트를 만들었으나 GameManager 컴포넌트가 빠져 게임이 동작하지 않음
+## CoPlay MCP 사용 규칙
 
-### save_scene 경로 지정
-- `save_scene`의 `scene_name`에 "GameScene"만 넣으면 `Assets/GameScene.unity`로 저장됨
-- 올바른 경로: `scene_name: "Scenes/GameScene"` -> `Assets/Scenes/GameScene.unity`로 저장
-- 실수 사례: 중복 씬 파일이 생성되어 혼란 발생
+### Editor 스크립트 관리
+- `execute_script`로 일회용 스크립트 실행 후 **반드시 즉시 삭제**한다
+- Editor 폴더에 스크립트를 남겨두지 않는다 — 코드 변경마다 전체 재컴파일 + 도메인 리로드가 발생하여 RAM이 급증한다
+- 디버그/확인 목적의 스크립트도 실행 후 삭제한다
 
-### Input System 설정 확인
-- Unity 6 LTS 프로젝트는 기본적으로 New Input System이 활성화되어 있을 수 있음
-- 기존 코드가 `UnityEngine.Input` (Old API)을 사용하면 `InvalidOperationException` 발생
-- Player Settings > Active Input Handling을 "Both"로 설정해야 Old/New 모두 사용 가능
-- 프로젝트 초기 또는 첫 Play 테스트 전에 반드시 확인한다
+### 불필요한 실행 금지
+- 코드만으로 확인 가능한 값(변수값, 수식 계산 등)은 CoPlay 실행 없이 코드를 직접 읽어서 답한다
+- 런타임 상태 확인이 꼭 필요한 경우에만 `execute_script`이나 `get_unity_logs`를 사용한다
 
-### Play Mode 중 제약
-- `save_scene`은 Play Mode 중 호출 불가 -> 반드시 `stop_game` 후 저장
-- Play Mode에서 추가한 컴포넌트/변경은 Play Mode 종료 시 사라짐 -> 에디터 모드에서 작업 후 저장
+## 게임 설계
 
-### SerializeField 값 변경 시 씬/프리팹 동시 반영 필수
-- 코드에서 `[SerializeField]` 기본값만 변경하면 Inspector에 이미 직렬화된 값이 우선됨
-- 반드시 `set_property` 또는 `execute_script`(SerializedObject)로 **씬 오브젝트와 프리팹 에셋 모두** 업데이트한다
-- 프리팹이 `Assets/Prefabs/`에 별도 존재하면, 씬 템플릿과 프리팹 양쪽 모두 변경해야 풀 클론에도 반영됨
-- 실수 사례: 씬 템플릿만 scale 0.7로 변경했으나 프리팹은 1.0 → 스폰된 클론 크기 불일치
+### 조작 방식
+- `↑/W` 누르는 동안 전진 (가속도 기반), 놓으면 감속
+- `↓/S` 후진 (절반 속도)
+- `←/→` 레인 전환 (3레인: -1, 0, 1)
+- `Space` 점프, `Left Shift` 슬라이드
+- 공중에서는 관성 유지 (airDeceleration으로 천천히 감속)
 
-### execute_script 크로스 어셈블리 제약
-- `execute_script`로 컴파일된 코드에서 `GameManager.Instance` 등 **static 프로퍼티는 null** 반환 (게임 어셈블리와 별도 어셈블리)
-- `Object.FindFirstObjectByType<T>()`는 정상 작동하지만 static 멤버 접근 불가
-- **해결법**: 게임 시작이 필요하면 `SuiteAutoStarter` 같은 **MonoBehaviour를 씬에 부착**하여 게임 어셈블리 컨텍스트에서 실행
-- execute_script는 데이터 조회/씬 저장 등 **에디터 작업에만** 사용한다
+### 물리 설정
+- 플레이어: Capsule, height=2, center=(0,0,0), position.y=1 → 발 y=0 (도로 위)
+- 도로 윗면: y=0
+- Ground Layer: index 6
+- useGravity=true, 상승/하강 모두 추가 중력 적용
 
-### 프리팹에 컴포넌트 추가 시 씬 + 프리팹 모두 적용
-- `add_component`는 대상(씬 오브젝트 vs 프리팹 에셋)에 따라 적용 범위가 다름
-- ObstaclePool이 프리팹에서 Instantiate하면, **프리팹 에셋에도 컴포넌트를 추가**해야 클론에 포함됨
-- `prefab_path` 파라미터를 명시하여 프리팹 에셋에도 적용한다
-- 실수 사례: AirObstacleMover를 씬 오브젝트에만 추가 → 풀 클론에 누락
+> 플레이어 관련 규칙은 `.claude/rules/player.md` 참조
 
-## 파이프라인 규칙
-
-### 구현 완료 후 반드시 에디터 플레이 검증
-- feature-orchestrator Phase 5에서 `play_game` -> `get_unity_logs` -> `capture_scene_object` -> `stop_game` 순서로 실행
-- 사용자가 변경사항을 직접 확인할 수 있도록 스크린샷을 캡처하여 전달한다
-- 에러 발생 시 즉시 수정하고 재검증 (최대 2회)
+## Game 뷰 해상도 (깨져 보이는 문제)
+- **Free Aspect**는 Game 탭의 창 크기 = 렌더링 해상도이므로, 창이 작으면 저해상도로 렌더링되어 깨져 보인다
+- **Full HD(1920×1080)** 등 고정 해상도 프리셋을 사용하면 정상 품질로 확인 가능
+- 이것은 에디터 표시 문제이지 실제 빌드 품질과 무관하다 — 빌드 시 디바이스 네이티브 해상도로 렌더링됨
+- 따라서 "깨져 보인다"는 피드백이 있을 때, 카메라/URP 설정을 건드리기 전에 **먼저 Game 뷰 해상도 프리셋을 확인**한다
