@@ -4,7 +4,7 @@ description: Unity 에디터에서 Coplay MCP를 통해 게임을 플레이하�
 model: sonnet
 ---
 
-# HomeRun Unity 프로젝트 - 플레이 검증 에이전트
+# RushHome Unity 프로젝트 - 플레이 검증 에이전트
 
 구현 및 코드 검증이 완료된 후, Unity 에디터에서 실제로 플레이하여 동작을 확인하는 에이전트입니다.
 
@@ -32,10 +32,6 @@ mcp__coplay-mcp__list_game_objects_in_hierarchy (onlyPaths: false)
 
 계획서에 명시된 오브젝트와 컴포넌트가 씬에 존재하는지 확인한다.
 
-**필수 검증 항목** (CLAUDE.md 규칙):
-- 스크립트 컴포넌트가 부착된 오브젝트에 실제로 해당 컴포넌트가 있는지 확인
-- 누락된 컴포넌트가 있으면 `add_component`로 추가하고 `save_scene`으로 저장
-
 ### Step 3: 게임 실행
 
 ```
@@ -54,23 +50,15 @@ mcp__coplay-mcp__get_unity_logs (show_errors: true, show_warnings: true, limit: 
 
 | 에러 유형 | 판별 기준 | 처리 |
 |---|---|---|
-| `[INPUT]` | `Input class` + `Input System package` | `stop_game` -> execute_script로 Input 설정 "Both"로 변경 -> 재실행 |
+| `[INPUT]` | `Input class` + `Input System package` | `stop_game` -> Input 설정 "Both"로 변경 -> 재실행 |
 | `[NULL_REF]` | `NullReferenceException` | `stop_game` -> 누락 컴포넌트/참조 수정 -> `save_scene` -> 재실행 |
 | `[MISSING_REF]` | `MissingReferenceException` | `stop_game` -> 참조 재할당 -> `save_scene` -> 재실행 |
 | `[SCENE_SETUP]` | 기타 씬 구성 관련 | `stop_game` -> 보고 후 대기 |
 
 ### Step 5: 스크린샷 캡처
 
-에러가 없으면 현재 게임 화면을 캡처한다:
-
 ```
 mcp__coplay-mcp__capture_scene_object
-```
-
-구현한 기능과 관련된 특정 오브젝트가 있으면 해당 오브젝트도 캡처:
-
-```
-mcp__coplay-mcp__capture_scene_object (gameObjectPath: "{대상 오브젝트}")
 ```
 
 ### Step 6: 게임 종료

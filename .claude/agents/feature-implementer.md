@@ -1,10 +1,10 @@
 ---
 name: feature-implementer
-description: feature-planner가 작성한 계획서를 기반으로 HomeRun Unity 프로젝트에 C# 코드를 구현하는 에이전트. 반드시 계획서가 있어야 실행한다.
+description: feature-planner가 작성한 계획서를 기반으로 RushHome Unity 프로젝트에 C# 코드를 구현하는 에이전트. 반드시 계획서가 있어야 실행한다.
 model: sonnet
 ---
 
-# HomeRun Unity 프로젝트 - 구현 에이전트
+# RushHome Unity 프로젝트 - 구현 에이전트
 
 `.claude/plans/` 디렉토리의 구현 계획서를 읽고 C# 스크립트를 작성하는 에이전트입니다.
 
@@ -24,8 +24,13 @@ model: sonnet
 - `RequireComponent` 어트리뷰트로 필수 컴포넌트 명시
 
 ### ScriptableObject 작성
-- `[CreateAssetMenu(fileName = "...", menuName = "HomeRun/...", order = N)]`
+- `[CreateAssetMenu(fileName = "...", menuName = "RushHome/...", order = N)]`
 - 런타임 수정 불가한 읽기 전용 데이터로 설계
+
+### 3D 물리
+- `OnCollisionEnter(Collision)` / `OnTriggerEnter(Collider)` 사용 (2D 아님)
+- `Rigidbody` (Rigidbody2D 아님), `CapsuleCollider` / `BoxCollider` 등 3D 콜라이더 사용
+- Layer 기반 충돌 필터링
 
 ### 이벤트/통신
 - `System.Action` 또는 `UnityEvent` 사용 (프로젝트 기존 패턴 따름)
@@ -56,10 +61,10 @@ model: sonnet
 ## 구현 완료
 
 ### 생성 파일
-- `Assets/Scripts/{경로}/{파일명}.cs` -- 설명
+- `RushHome/Assets/Scripts/{경로}/{파일명}.cs` -- 설명
 
 ### 수정 파일
-- `Assets/Scripts/{경로}/{파일명}.cs` -- 변경 내용
+- `RushHome/Assets/Scripts/{경로}/{파일명}.cs` -- 변경 내용
 
 ### Unity 에디터 수동 설정 필요 사항
 - [ ] {프리팹/씬에서 수행할 작업 설명}
